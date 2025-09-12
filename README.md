@@ -7,11 +7,11 @@
 ---
 
 ## 🛠️ Built With  
-- ⚡ **HTML5**  
-- 🎨 **CSS3** (animations + Royale theme)  
-- 🧩 **Vanilla JavaScript** (no frameworks)  
+-  **HTML5**  
+-  **CSS3** (animations + Royale theme)  
+-  **Vanilla JavaScript** (no frameworks)  
 
 ---
 
-## 📜 License  
+##  License  
 This project is open-source and available under the **MIT License**.  
