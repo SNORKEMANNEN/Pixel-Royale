@@ -1,2 +1,17 @@
-# Pixel-Royale
-Pixel Royale is a Clash Royale–inspired browser guessing game. Each card starts as a heavily pixelated image (only 6 pixels). Every wrong guess makes the card a little clearer. Can you guess the card before it’s fully revealed?
+#  Pixel Royale  
+
+>  **Guess the Clash Royale cards from just a few pixels!**  
+> Start with a blurry, pixelated card… every wrong guess makes it clearer.  
+> Can you recognize them all before the image is fully revealed?
+> 
+---
+
+## 🛠️ Built With  
+- ⚡ **HTML5**  
+- 🎨 **CSS3** (animations + Royale theme)  
+- 🧩 **Vanilla JavaScript** (no frameworks)  
+
+---
+
+## 📜 License  
+This project is open-source and available under the **MIT License**.  
