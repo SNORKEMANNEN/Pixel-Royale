@@ -6,7 +6,7 @@
 > 
 ---
 
-## 🛠️ Built With  
+##  Built With  
 -  **HTML5**  
 -  **CSS3** (animations + Royale theme)  
 -  **Vanilla JavaScript** (no frameworks)  
