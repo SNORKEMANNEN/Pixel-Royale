@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pixel Royale – Guess the card!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --royal-blue:#2b5fd9;
+      --royal-blue-dark:#1e3ea8;
+      --royal-blue-deep:#0d1d63;
+      --gold:#ffcc33;
+      --gold-deep:#d4a017;
+      --stone:#263147;
+      --ink:#0b1020;
+      --success:#27c46b;
+      --danger:#ff4d4d;
+      --card-bg:#0d142b;
+      --purple-glow:#8b5cf6;
+      --cyan-glow:#06b6d4;
+    }
+
+    :root[data-reduced-motion="true"] *,
+    :root[data-reduced-motion="true"] *::before,
+    :root[data-reduced-motion="true"] *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    @font-face {
+    font-family: 'Clash';
+    src: url('Clash-Regular.woff2') format('woff2'),
+        url('Clash-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+  
+    *{box-sizing:border-box}
+    html,body{
+      height:100%;
+      background: radial-gradient(1200px 700px at 20% -10%, #3c6eff 0%, rgba(60,110,255,0) 60%),
+        radial-gradient(900px 600px at 100% 0%, #1a2a6b 0%, rgba(26,42,107,0) 60%), 
+        linear-gradient(180deg, #0b1020, #141b35);
+    }
+    body{
+      margin:0;
+      color:#eef2ff;
+      font-family:Clash,system-ui,Segoe UI,Roboto,Helvetica,Arial;
+      overflow-x: hidden;
+    }
+    
+    .stars{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      background-image:radial-gradient(2px 2px at 20% 30%,#fff8,transparent),
+        radial-gradient(1.5px 1.5px at 70% 20%,#fff6,transparent),
+        radial-gradient(2px 2px at 40% 70%,#fff7,transparent),
+        radial-gradient(1px 1px at 80% 80%,#fff5,transparent),
+        radial-gradient(2.5px 2.5px at 10% 60%,#fff7,transparent);
+      animation: twinkle 8s ease-in-out infinite;
+    }
+    @keyframes twinkle{
+      0%, 100% { filter:brightness(1) }
+      25% { filter:brightness(1.4) }
+      50% { filter:brightness(1.1) }
+      75% { filter:brightness(1.3) }
+    }
+
+    .wrap{
+      position:relative;
+      z-index:1;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:20px;
+      width: 100%;
+    }
+    
+    .frame{
+      width:min(1200px,95vw);
+      max-width: 100%;
+      background:linear-gradient(135deg, var(--royal-blue-dark), var(--royal-blue-deep), #0a1325); 
+      border-radius:32px; 
+      padding:28px; 
+      box-shadow:0 40px 120px #0006, inset 0 0 0 3px #ffffff15, 0 0 60px #4f46e520; 
+      position:relative; 
+      overflow:hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(20px);
+    }
+    
+    .frame::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+      border-radius: 32px 32px 0 0;
+      pointer-events: none;
+    }
+    
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between; 
+      gap:16px; 
+      padding:16px 22px; 
+      border-radius:24px; 
+      background:linear-gradient(135deg,#2c448f,#16245e, #0f1a42); 
+      box-shadow: inset 0 0 0 2px #ffffff10, 0 12px 24px #0008, 0 0 30px #4f46e515;
+      flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .topbar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width: 0;
+    }
+    
+    .brand .logo {
+      width: 68px;
+      height: 68px;
+      flex-shrink: 0;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+      transition: transform 0.3s ease;
+    }
+
+    .brand .logo:hover {
+      transform: scale(1.05) rotate(2deg);
+    }
+    
+    .stats{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap: wrap;
+    }
+    
+    .pill{
+      display:flex;
+      align-items:center;
+      gap:8px; 
+      padding:10px 16px; 
+      border-radius:999px; 
+      background:linear-gradient(135deg,#143088,#0c1a55, #081238); 
+      box-shadow:inset 0 0 0 2px #ffffff15, 0 4px 8px #00000030;
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.3s ease;
+    }
+
+    .pill:hover {
+      transform: translateY(-1px);
+      box-shadow:inset 0 0 0 2px #ffffff25, 0 6px 12px #00000040;
+    }
+
+    .pill b{
+      color:#ffd95a; 
+      text-shadow:0 2px 4px #000;
+      font-weight: 800;
+    }
+
+    .main{
+      display:grid; 
+      grid-template-columns:1.2fr 0.8fr; 
+      gap:28px; 
+      margin-top:24px;
+      align-items: start;
+    }
+    
+    @media (max-width:1000px){
+      .main{grid-template-columns:1fr;} 
+      .frame{padding:20px; border-radius: 24px;}
+      .brand .logo {width: 56px; height: 56px;}
+      .topbar {padding: 12px 18px;}
+      .pill {padding: 8px 14px; font-size: 13px;}
+    }
+
+    .stage{
+      background:linear-gradient(135deg,#0d142b,#101a3f, #0a1226); 
+      border-radius:28px; 
+      padding:24px; 
+      box-shadow:inset 0 0 0 3px #ffffff10, 0 20px 40px #00000020;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stage::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+      border-radius: 28px 28px 0 0;
+    }
+      
+    .card-frame {
+      width: 100%;
+      max-width: 350px;
+      aspect-ratio: 3/4;
+      margin: 0 auto 24px auto;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px #00000030, 0 0 60px #4f46e515;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-frame:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 30px 60px #00000040, 0 0 80px #4f46e520;
+    }
+
+    canvas#pixelCanvas {
+      width: 100%;
+      height: 100%;
+      display:block;
+      border-radius:16px;
+      background: var(--card-bg);
+    }
+
+    /* Enhanced Wrong Guesses Section */
+    .wrong-guesses-section {
+      margin-top: 20px;
+    }
+
+    .wrong-guesses-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ff9999;
+      text-align: center;
+      margin-bottom: 16px;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.4s ease;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .wrong-guesses-title.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #wrongGuesses {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 16px;
+      justify-items: center;
+      min-height: 0;
+      padding: 0 8px;
+    }
+
+    .guess-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 11px;
+      opacity: 0;
+      transform: scale(0.3) translateY(40px) rotateX(90deg);
+      background: linear-gradient(135deg, rgba(255, 77, 77, 0.15), rgba(139, 92, 246, 0.1));
+      padding: 12px 8px;
+      border-radius: 12px;
+      border: 2px solid rgba(255, 77, 77, 0.3);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      animation: guessItemEntry 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .guess-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.2) 50%, 
+        transparent 100%);
+      transition: left 0.6s ease;
+    }
+
+    .guess-item:hover::before {
+      left: 100%;
+    }
+
+    .guess-item:hover {
+      transform: scale(1.1) translateY(-4px);
+      background: linear-gradient(135deg, rgba(255, 77, 77, 0.25), rgba(139, 92, 246, 0.2));
+      border-color: rgba(255, 77, 77, 0.5);
+      box-shadow: 0 12px 24px rgba(255, 77, 77, 0.2), 0 0 30px rgba(139, 92, 246, 0.1);
+    }
+
+    .guess-item img {
+      width: 56px;
+      height: 74px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+
+    .guess-item:hover img {
+      transform: scale(1.05);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    }
+
+    .guess-item span {
+      text-align: center;
+      line-height: 1.3;
+      color: #ffcccc;
+      font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    @keyframes guessItemEntry {
+      0% {
+        opacity: 0;
+        transform: scale(0.3) translateY(40px) rotateX(90deg);
+      }
+      60% {
+        opacity: 1;
+        transform: scale(1.1) translateY(-8px) rotateX(-5deg);
+      }
+      80% {
+        transform: scale(0.95) translateY(2px) rotateX(2deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0) rotateX(0deg);
+      }
+    }
+
+    .next-tag{
+      position:absolute; 
+      top:12px; 
+      right:-70px; 
+      transform:rotate(35deg); 
+      background:linear-gradient(135deg,var(--gold),var(--gold-deep), #b8860b); 
+      color:#2d1600; 
+      font-weight:900; 
+      padding:8px 80px; 
+      box-shadow:0 12px 24px #00000040, 0 0 30px rgba(255,204,51,0.3); 
+      text-shadow:0 1px 2px rgba(0,0,0,0.3); 
+      border-radius:10px;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .sidebar{
+      background:linear-gradient(135deg,#0d142b,#121b3e, #0a1226); 
+      border-radius:28px; 
+      padding:24px; 
+      box-shadow:inset 0 0 0 3px #ffffff10, 0 20px 40px #00000020; 
+      display:grid; 
+      gap:18px;
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+      border-radius: 28px 28px 0 0;
+    }
+
+    .guess-row{display:flex; gap:12px}
+    .input{
+      flex:1; 
+      background:linear-gradient(135deg, #0b132b, #0f1a3d); 
+      border:2px solid #1b2a5c; 
+      color:#e7ecff; 
+      border-radius:16px; 
+      padding:16px 18px; 
+      outline:0; 
+      font-weight:600; 
+      box-shadow:0 8px 20px #00000020, inset 0 2px 4px rgba(255,255,255,0.05); 
+      transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: inherit;
+      font-size: 15px;
+    }
+    .input:focus{
+      border-color:#4e7dff; 
+      box-shadow:0 12px 32px #00000030, 0 0 0 4px #4e7dff33, inset 0 2px 4px rgba(255,255,255,0.1);
+      transform: translateY(-2px);
+    }
+    
+    .btn{
+      appearance:none; 
+      border:0; 
+      background:linear-gradient(135deg,#ffd86b,#caa141, #b8941f); 
+      color:#2b1a00; 
+      font-family:"Clash"; 
+      font-weight:900; 
+      letter-spacing:.4px; 
+      padding: 14px 22px; 
+      border-radius:16px; 
+      box-shadow:0 12px 0 #7d5a13, 0 20px 40px #00000030; 
+      transform:translateY(0); 
+      transition:all .3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow .15s ease;
+      cursor: pointer;
+      font-size: 14px;
+      white-space: nowrap;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+      transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover{
+      transform:translateY(-3px); 
+      filter:saturate(1.2) brightness(1.05);
+      box-shadow:0 15px 0 #7d5a13, 0 25px 50px #00000040;
+    }
+    .btn:active{
+      transform:translateY(3px); 
+      box-shadow:0 6px 0 #7d5a13, 0 12px 24px #00000040
+    }
+
+    .status{display:grid; gap:16px; font-size:14px}
+    .bar{
+      height:14px; 
+      background:linear-gradient(135deg, #0a1433, #0f1a42); 
+      border:2px solid #ffffff15; 
+      border-radius:999px; 
+      overflow:hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .bar > div{
+      height:100%; 
+      background:linear-gradient(90deg,#46f28f,#2cd2ff, #8b5cf6); 
+      width:0;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 20px rgba(70, 242, 143, 0.3);
+    }
+
+    .toast{
+      position:fixed; 
+      inset:auto 0 32px 0; 
+      display:grid; 
+      place-items:center; 
+      pointer-events:none; 
+      z-index:1000;
+    }
+    .toast .msg{
+      pointer-events:auto; 
+      padding:16px 24px; 
+      border-radius:16px; 
+      background:linear-gradient(135deg, #0d142b, #1a2545); 
+      border:2px solid #1b2a5c; 
+      box-shadow:0 20px 60px #000000aa, 0 0 40px rgba(78, 125, 255, 0.2);
+      transform: translateY(100px) scale(0.9);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      backdrop-filter: blur(20px);
+      font-weight: 600;
+    }
+
+    .toast.show .msg {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .shake{animation:shake .6s cubic-bezier(0.34, 1.56, 0.64, 1)}
+    @keyframes shake{
+      0%, 100%{transform:translateX(0)}
+      10%{transform:translateX(-6px) rotate(-1deg)}
+      20%{transform:translateX(6px) rotate(1deg)}
+      30%{transform:translateX(-8px) rotate(-1deg)}
+      40%{transform:translateX(8px) rotate(1deg)}
+      50%{transform:translateX(-6px) rotate(-0.5deg)}
+      60%{transform:translateX(6px) rotate(0.5deg)}
+      70%{transform:translateX(-4px)}
+      80%{transform:translateX(4px)}
+      90%{transform:translateX(-2px)}
+    }
+
+    /* Enhanced Confetti System */
+    .confetti{
+      position:absolute; 
+      inset:0; 
+      pointer-events:none; 
+      overflow:hidden;
+      border-radius: 16px;
+    }
+
+    .confetti-particle {
+      position: absolute;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .hint{
+      font-size:12px; 
+      color:#a6b6ff;
+      opacity: 0.8;
+      text-align: center;
+    }
+    
+    .footer{
+      opacity:.85; 
+      text-align:center; 
+      font-size:12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .footer a{color:#9ec1ff; transition: color 0.3s ease;}
+    .footer a:hover{color:#fff;}
+
+    /* Improved Autocomplete */
+    #autocomplete {
+      display: grid;
+      gap: 6px;
+      max-height: 240px;
+      overflow-y: auto;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      padding: 4px;
+    }
+
+    #autocomplete::-webkit-scrollbar { display: none; }
+
+    .autocomplete-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #143088, #0c1a55, #081238);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 1px solid rgba(255,255,255,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .autocomplete-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+      transition: left 0.5s ease;
+    }
+
+    .autocomplete-item img {
+      width: 36px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .autocomplete-item:hover {
+      background: linear-gradient(135deg, #2a5cff, #1a4ae6, #0f2db8);
+      transform: scale(1.02) translateY(-1px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), 0 0 20px rgba(42, 92, 255, 0.2);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .autocomplete-item:hover::before { left: 100%; }
+
+    .autocomplete-item:active {
+      transform: scale(0.98); 
+      transition: transform 0.1s ease;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.8) translateY(20px); opacity: 0; }
+      60% { transform: scale(1.05) translateY(-4px); opacity: 1; }
+      100% { transform: scale(1) translateY(0); }
+    }
+
+    #toggleLabel {
+      font-size: 12px;
+      font-weight: 600;
+      color: #eaeaea;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.3s ease;
+    }
+
+    #toggleLabel:hover { color: #fff; }
+
+    #toggleMotionBtn {
+      position: relative;
+      width: 52px;
+      height: 26px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      background: linear-gradient(145deg, #ff4444, #cc0000);
+      overflow: hidden;
+      vertical-align: middle;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.1);
+    }
+
+    #toggleMotionBtn::before {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 22px;
+      height: 22px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(4px);
+      border-radius: 50%;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.8);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #toggleMotionBtn.active {
+      background: linear-gradient(145deg, #00aa00, #006600);
+    }
+
+    #toggleMotionBtn.active::before {
+      transform: translateX(26px);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.8), 0 0 12px rgba(0, 255, 0, 0.3);
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 600px) {
+      .wrap { padding: 12px; }
+      .frame { padding: 16px; border-radius: 20px; }
+      .topbar { 
+        flex-direction: column; 
+        gap: 12px; 
+        text-align: center; 
+        padding: 16px;
+      }
+      .stats { justify-content: center; }
+      .main { gap: 20px; }
+      .card-frame { max-width: 300px; }
+      .sidebar { padding: 18px; position: static; }
+      .guess-row { flex-direction: column; }
+      .btn { width: 100%; }
+      #wrongGuesses { 
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); 
+        gap: 12px; 
+      }
+      .guess-item img { width: 48px; height: 64px; }
+      .guess-item { padding: 10px 6px; }
+    }
+
+    /* Performance optimizations */
+    .stage, .sidebar, .card-frame {
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+
+    * { scroll-behavior: smooth; }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { 
+      background: linear-gradient(180deg, #4e7dff, #2a5cff); 
+      border-radius: 4px; 
+    }
+    ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #6e9dff, #4a7cff); }
+  </style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="wrap">
+  <div class="frame">
+    <div class="topbar">
+      <div class="brand">
+        <img src="assets/logo.png" alt="Logo" class="logo" />
+      </div>
+      <div class="stats">
+        <div class="pill"><span>Score:</span>&nbsp;<b id="score">0</b></div>
+        <div class="pill"><span>Round:</span>&nbsp;<b id="round">1</b></div>
+        <div class="pill"><span>Pixels:</span>&nbsp;<b id="pixelInfo">6</b></div>
+      </div>
+    </div>
+
+    <div class="main">
+      <section class="stage">
+        <div class="card-frame" id="cardFrame">
+          <canvas id="pixelCanvas" width="600" height="800" aria-label="Clash Royale card"></canvas>
+          <div class="confetti" id="confetti"></div>
+          <span class="next-tag" id="nextTag" style="display:none;">Next!</span>
+        </div>
+        
+        <div class="wrong-guesses-section">
+          <div class="wrong-guesses-title" id="wrongGuessesTitle">Wrong Guesses</div>
+          <div id="wrongGuesses" class="wrong-guesses"></div>
+        </div>
+      </section>
+      
+      <aside class="sidebar">
+        <form id="guessForm" class="guess-row" autocomplete="off">
+          <input id="guessInput" class="input" placeholder="Guess card name… (e.g. Knight)" />
+          <button class="btn" type="submit">Guess</button>
+        </form>
+        <div id="autocomplete"></div>
+
+        <div class="hint">Tip: Start typing to get autocomplete suggestions.</div>
+
+        <div class="status">
+          <div>Difficulty Progress</div>
+          <div class="bar"><div id="difficultyBar"></div></div>
+          <div id="statusText">Starting at 6 pixels.</div>
+          <button class="btn" id="skipBtn" title="Give up and reveal">Give up</button>
+          <button class="btn" id="resetBtn" title="Restart the game">Restart</button>
+        </div>
+        
+        <div class="footer">
+          <label id="toggleLabel" for="toggleMotionBtn">Disable Animations</label>
+          <button id="toggleMotionBtn"></button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" style="display:none">
+  <div class="msg" id="toastMsg"></div>
+</div>
+
+<script>
+// Enhanced JavaScript with improved animations and effects
+
+const DECK = [
+  { name:"Knight", aliases:["Knight"], src:"https://i.ibb.co/x8RkNyrg/knight.png" },
+  { name:"Archers", aliases:["Archer","Archers"], src:"https://i.ibb.co/JWTnrQH4/archers-Cb-WDu-Tf-Y.webp" },
+  { name:"Giant", aliases:["Giant"], src:"https://i.ibb.co/ZRF3Nv33/giant-D9w-Wcvn6.webp" },
+  { name:"Musketeer", aliases:["Musketeer"], src:"https://i.ibb.co/ymzGFZFy/musketeer-DQp-JQ7-Wk.webp" },
+  { name:"Mini P.E.K.K.A", aliases:["Mini P.E.K.K.A","Mini Pekka","Pekka", "P.E.K.K.A"], src:"https://i.ibb.co/HfKD5BD1/mini-pekka-B5hr-QNV5.webp" },
+  { name:"Wizard", aliases:["Wizard"], src:"https://i.ibb.co/5WS927SP/wizard-TZ61h-Fv-B.webp"},
+  { name:"Prince", aliases:["Prince"], src:"https://i.ibb.co/Xk3GTpC3/prince-jc-Ls-Jr-Dj.webp" },
+  { name:"Baby Dragon", aliases:["Baby Dragon", "dragon"], src:"https://i.ibb.co/ksq0SZG0/baby-dragon-BXNh-WASe.webp" },
+  { name:"Hog Rider", aliases:["Hog Rider","Hogrider","Hog"], src:"https://i.ibb.co/4nJ0hJ96/hog-rider-Cd-UFl-G6b.webp" },
+  { name:"Valkyrie", aliases:["Valkyrie"], src:"https://i.ibb.co/Rx6299s/valkyrie-fu-Rgla-Yj.webp" },
+  { name:"Skeletons", aliases:["Skeletons"], src:"https://i.ibb.co/svks9yg2/skeletons.webp" },
+  { name:"Goblins", aliases:["Goblins"], src:"https://i.ibb.co/hNbZjpZ/goblins.webp" },
+  { name:"Spear Goblins", aliases:["Spear Goblins", "Goblin"], src:"https://i.ibb.co/DfbQzyDr/spear-goblins.webp" },
+  { name:"Bomber", aliases:["Bomber"], src:"https://i.ibb.co/jvDPtMTY/bomber.webp" },
+  { name:"Bats", aliases:["Bats"], src:"https://i.ibb.co/zV93Fgg5/bats.webp" },
+  { name:"Zap", aliases:["Zap"], src:"https://i.ibb.co/7tQtZyYd/zap.webp" },
+  { name:"Giant Snowball", aliases:["Giant Snowball", "Snowball"], src:"https://i.ibb.co/zVW76HFs/giant-snowball.webp" },
+  { name:"Berserker", aliases:["Berserker"], src:"https://i.ibb.co/NgTFGLxL/berserker.webp" },
+  { name:"Ice Spirit", aliases:["Ice Spirit", "Spirit"], src:"https://i.ibb.co/Lz3Mm7yD/ice-spirit.webp" },
+  { name:"Fire Spirit", aliases:["Fire Spirit", "Spirit"], src:"https://i.ibb.co/fY3NRJsY/fire-spirit.webp" },
+  { name:"Heal Spirit", aliases:["Heal Spirit", "Spirit"], src:"https://i.ibb.co/N6BTPvTg/heal-spirit.webp" },
+  { name:"Arrows", aliases:["Arrows"], src:"https://i.ibb.co/Lz77X1QG/arrows.webp" },
+  { name:"Skeleton Barrel", aliases:["Skeleton Barrel", "Barrel"], src:"https://i.ibb.co/Mxj8T9M5/skeleton-barrel.webp" },
+  { name:"Firecracker", aliases:["Firecracker"], src:"https://i.ibb.co/GSYwVF8/firecracker.webp" },
+  { name:"Mortar", aliases:["Mortar"], src:"https://i.ibb.co/W4rnkcP4/mortar.webp" },
+  { name:"Cannon", aliases:["Cannon"], src:"https://i.ibb.co/Cs2hP1jh/cannon.webp" },
+  { name:"Tesla", aliases:["Tesla"], src:"https://i.ibb.co/3mWZyk9z/tesla.webp" },
+  { name:"Barbarians", aliases:["Barbarians"], src:"https://i.ibb.co/Nn6Y3nhg/barbarians.webp" },
+  { name:"Royal Giant", aliases:["Royal Giant","Giant"], src:"https://i.ibb.co/LXpX550C/royalgiant.webp" },
+  { name:"Royal Recruits", aliases:["Royal Recruits", "Recruits"], src:"https://i.ibb.co/j9DpNcnT/royal-recruits.webp" },
+  { name:"Dart Goblin", aliases:["Dart Goblin", "Goblin"], src:"https://i.ibb.co/CKjYfH5d/dart-goblin.webp" },
+  { name:"Goblin Cage", aliases:["Goblin Cage", "Cage"], src:"https://i.ibb.co/jPWkWDYP/goblin-cage.webp" },
+  { name:"Battle Ram", aliases:["Battle Ram", "Ram"], src:"https://i.ibb.co/B2TBqLtj/battle-ram.webp" },
+  { name:"Furnace", aliases:["Furnace"], src:"https://i.ibb.co/cXJLQ6qS/Furnace-Card.webp" },
+  { name:"Wall Breakers", aliases:["Wall Breakers"], src:"https://i.ibb.co/r22cVXvK/wall-breakers.webp" },
+  { name:"Goblin Barrel", aliases:["Goblin Barrel", "Barrel"], src:"https://i.ibb.co/ZzbrZyZz/goblin-barrel.webp" },
+  { name:"Hunter", aliases:["Hunter"], src:"https://i.ibb.co/1fnY195B/hunter.webp" },
+  { name:"Goblin Drill", aliases:["Goblin Drill", "Drill"], src:"https://i.ibb.co/hbDh9Y0/goblin-drill.webp" },
+  { name:"Witch", aliases:["Witch"], src:"https://i.ibb.co/ZRBxd8TK/Witch-Card.webp" },
+  { name:"Electro Dragon", aliases:["Electro Dragon", "Dragon"], src:"https://i.ibb.co/4ZmZ0n0M/electro-dragon.webp" },
+  { name:"Executioner", aliases:["Executioner"], src:"https://i.ibb.co/k2KXxP3D/executioner.webp" },
+  { name:"Goblin Giant", aliases:["Goblin Giant", "Giant"], src:"https://i.ibb.co/zh93Lg3B/goblin-giant.webp" },
+  { name:"P.E.K.K.A", aliases:["P.E.K.K.A", "Pekka"], src:"https://i.ibb.co/cSCjQ619/pekka.webp" },
+  { name:"Inferno Dragon", aliases:["Inferno Dragon", "Dragon"], src:"https://i.ibb.co/VpWPdt7m/inferno-dragon.webp" },
+  { name:"Lumberjack", aliases:["Lumberjack"], src:"https://i.ibb.co/zWcqc162/lumberjack.webp" },
+  { name:"Mega Knight", aliases:["Mega Knight", "Knight"], src:"https://i.ibb.co/Wv0VCYqt/mega-knight.webp" },
+  { name:"Mirror", aliases:["Mirror"], src:"https://i.ibb.co/0RvBKd8L/mirror.webp" },
+  { name:"Barbarian Barrel", aliases:["Barbarian Barrel", "Barrel"], src:"https://i.ibb.co/2YKGh1g7/barbarian-barrel.webp" },
+  { name:"Clone", aliases:["Clone"], src:"https://i.ibb.co/cX1HDrfV/clone.webp" },  
+  { name:"Void", aliases:["Void"], src:"https://i.ibb.co/DPVYh0fP/void.webp" },
+  { name:"Dark Prince", aliases:["Dark Prince", "Prince"], src:"https://i.ibb.co/Gfn1Vvjw/dark-prince.webp" },
+  { name:"Freeze", aliases:["Freeze"], src:"https://i.ibb.co/h1ZxkLn0/freeze.webp" },
+  { name:"Poison", aliases:["Poison"], src:"https://i.ibb.co/7tjcjBS6/poison.webp" },
+  { name:"Rune Giant", aliases:["Rune Giant", "Giant"], src:"https://i.ibb.co/qLqbSb20/rune-giant.webp" },
+  { name:"Balloon", aliases:["Balloon"], src:"https://i.ibb.co/gb67HyXj/balloon.webp" },
+  { name:"Bowler", aliases:["Bowler"], src:"https://i.ibb.co/0V2QjTLg/bowler.webp" },
+  { name:"Cannon Cart", aliases:["Cannon Cart", "Cart"], src:"https://i.ibb.co/Cs0Sn7Qk/cannon-cart.webp" },
+  { name:"Giant Skeleton", aliases:["Giant Skeleton", "Skeleton"], src:"https://i.ibb.co/wFPG6snC/giant-skeleton.webp" },
+  { name:"Lightning", aliases:["Lightning"], src:"https://i.ibb.co/n8Bm5mfZ/lightning.webp" },
+  { name:"X-Bow", aliases:["X-Bow", "xbow", "bow"], src:"https://i.ibb.co/WWd6tn3p/x-bow.webp" },
+  { name:"Electro Giant", aliases:["Electro Giant", "Giant"], src:"https://i.ibb.co/6cy7yTGx/electro-giant.webp" },
+  { name:"Golem", aliases:["Golem"], src:"https://i.ibb.co/VWgzNNWV/golem.webp" },
+  { name:"Three Musketeers", aliases:["Three Musketeers", "Musketeers"], src:"https://i.ibb.co/C3vC2BB6/three-musketeers.webp" },
+  { name:"Ice Golem", aliases:["Ice Golem", "Golem"], src:"https://i.ibb.co/n81csvCp/ice-golem.webp" },
+  { name:"Suspicious Bush", aliases:["Suspicious Bush", "Bush"], src:"https://i.ibb.co/ym5HmhPm/suspicious-bush.webp" },
+  { name:"Tombstone", aliases:["Tombstone"], src:"https://i.ibb.co/Fpv85CQ/tombstone.webp" },
+  { name:"Mega Minion", aliases:["Mega Minion", "Minion"], src:"https://i.ibb.co/TDcRCG75/mega-minion.webp" },
+  { name:"Earthquake", aliases:["Earthquake"], src:"https://i.ibb.co/NdkM8vcr/earthquake.webp" },
+  { name:"Elixir Golem", aliases:["Elixir Golem", "Golem"], src:"https://i.ibb.co/Kc9mJtCP/elixir-golem.webp" },
+  { name:"Flying Machine", aliases:["Flying Machine", "Machine"], src:"https://i.ibb.co/1J0VnHdb/flying-machine.webp" },
+  { name:"Battle Healer", aliases:["Battle Healer", "Healer"], src:"https://i.ibb.co/tMVbYT4y/battle-healer.webp" },
+  { name:"Zappies", aliases:["Zappies"], src:"https://i.ibb.co/hJg3ZNgZ/zappies.webp" },
+  { name:"Goblin Demolisher", aliases:["Goblin Demolisher", "Demolisher"], src:"https://i.ibb.co/VYb2sJ6x/goblin-demolisher.webp" },
+  { name:"Royal Hogs", aliases:["Royal Hogs", "Hogs"], src:"https://i.ibb.co/Zz7LszPg/royal-hogs.webp" },
+  { name:"Rocket", aliases:["Rocket"], src:"https://i.ibb.co/DfbhmLnp/rocket.webp" },
+  { name:"Elixir Collector", aliases:["Elixir Collector", "Collector"], src:"https://i.ibb.co/N6zbjKgg/elixir-collector.webp" },
+  { name:"Minions", aliases:["Minions"], src:"https://i.ibb.co/0yvWKk07/minions.webp" },
+  { name:"Skeleton Army", aliases:["Skeleton Army", "Army"], src:"https://i.ibb.co/PvgNJ0tL/skeleton-army.webp" },
+  { name:"Fireball", aliases:["Fireball"], src:"https://i.ibb.co/4Q9LpX4/fireball.webp" },
+  { name:"Elite Barbarians", aliases:["Elite Barbarians","Barbarians"], src:"https://i.ibb.co/zWV2GRvm/elite-barbarians.webp" },
+  { name:"Minion Horde", aliases:["Minion Horde","Horde"], src:"https://i.ibb.co/1tDDjn55/minion-horde.webp" },
+  { name:"Tornado", aliases:["Tornado"], src:"https://i.ibb.co/MyLdBQRB/tornado.webp" },
+  { name:"Rage", aliases:["Rage"], src:"https://i.ibb.co/Zz36n4rj/rage.webp" },
+  { name:"Princess", aliases:["Princess"], src:"https://i.ibb.co/hF2nDYJr/princess.webp" },
+  { name:"Miner", aliases:["Miner"], src:"https://i.ibb.co/0RLymcGV/miner.webp" },
+  { name:"The Log", aliases:["The Log","Log"], src:"https://i.ibb.co/GQsrQnV0/the-log.webp" },
+  { name:"Sparky", aliases:["Sparky"], src:"https://i.ibb.co/NDZkkgn/sparky.webp" },
+  { name:"Night Witch", aliases:["Night Witch","Witch"], src:"https://i.ibb.co/KzqY0qPs/Night-Witch-Card.webp" },
+  { name:"Fisherman", aliases:["Fisherman"], src:"https://i.ibb.co/PZS9ZNBN/fisherman.webp" },
+  { name:"Lava Hound", aliases:["Lava Hound","Hound"], src:"https://i.ibb.co/dJpY7Ds5/lava-hound.webp" },
+  { name:"Graveyard", aliases:["Graveyard"], src:"https://i.ibb.co/ycmkmYgL/graveyard.webp" },
+  { name:"Ice Wizard", aliases:["Ice Wizard","Wizard"], src:"https://i.ibb.co/v6VW4JtM/ice-wizard.webp" },
+  { name:"Royal Ghost", aliases:["Royal Ghost","Ghost"], src:"https://i.ibb.co/Q7sjR5gt/royal-ghost.webp" },
+  { name:"Bandit", aliases:["Bandit"], src:"https://i.ibb.co/qMsTtBGM/bandit.webp" },
+  { name:"Magic Archer", aliases:["Magic Archer","Archer"], src:"https://i.ibb.co/nsdMpXzw/magic-archer.webp" },
+  { name:"Phoenix", aliases:["Phoenix"], src:"https://i.ibb.co/B5fb714j/pheonix.webp" },
+  { name:"Archer Queen", aliases:["Archer Queen","Queen"], src:"https://i.ibb.co/XfyVgJ6h/archer-queen.webp" },
+  { name:"Golden Knight", aliases:["Golden Knight","Knight"], src:"https://i.ibb.co/DPXJ27KQ/golden-knight.webp" },
+  { name:"Skeleton King", aliases:["Skeleton King","King"], src:"https://i.ibb.co/v6vLKmp7/skeleton-king.webp" },
+  { name:"Mighty Miner", aliases:["Mighty Miner","Miner"], src:"https://i.ibb.co/mndp3FZ/mighty-miner.webp" },
+  { name:"Little Prince", aliases:["Little Prince","Prince"], src:"https://i.ibb.co/QFjn4y0R/little-prince.webp" },
+  { name:"Monk", aliases:["Monk"], src:"https://i.ibb.co/JRyqY1J8/monk.webp" },
+  { name:"Inferno Tower", aliases:["Inferno Tower","Tower"], src:"https://i.ibb.co/wNqcYVR3/inferno-tower.webp" },
+  { name:"Bomb Tower", aliases:["Bomb Tower", "Tower"], src:"https://i.ibb.co/r2XGts3p/bomb-tower.webp" },
+  { name:"Goblin Hut", aliases:["Goblin Hut","Hut"], src:"https://i.ibb.co/PGjfPj3q/goblin-hut.webp" },
+  { name:"Barbarian Hut", aliases:["Barbarian Hut", "Hut"], src:"https://i.ibb.co/xKhKsf1v/barbarian-hut.webp" },
+  { name:"Royal Delivery", aliases:["Royal Delivery", "Delivery"], src:"https://i.ibb.co/x8rCnXBB/royal-delivery.webp" },
+  { name:"Vines", aliases:["Vines"], src:"https://i.ibb.co/1GvDNRkC/vines.webp" },
+  { name:"Goblin Curse", aliases:["Goblin Curse","Curse"], src:"https://i.ibb.co/Z63jFrM2/goblin-curse.webp" },
+  { name:"Electro Wizard", aliases:["Electro Wizard, Wizard"], src:"https://i.ibb.co/GfHjbMJL/electro-wizard.webp" },
+  { name:"Skeleton Dragon", aliases:["Skeleton, Dragon"], src:"https://i.ibb.co/nqZyK5Wk/skeleton-dragons.webp" }
+
+];
+
+const START_PIXELS = 6;
+const PIXEL_STEP = 6;
+const MAX_PIXELS = 400;
+
+// Game state
+let score = 0;
+let round = 1;
+let difficultyPixels = START_PIXELS;
+let order = shuffle([...DECK.keys()]);
+let cursor = 0;
+let wrongGuesses = [];
+let currentImage = new Image();
+let autocompleteTimeout;
+
+// DOM elements
+const canvas = document.getElementById('pixelCanvas');
+const ctx = canvas.getContext('2d');
+const pixelInfo = document.getElementById('pixelInfo');
+const scoreEl = document.getElementById('score');
+const roundEl = document.getElementById('round');
+const statusText = document.getElementById('statusText');
+const diffBar = document.getElementById('difficultyBar');
+const nextTag = document.getElementById('nextTag');
+const guessForm = document.getElementById('guessForm');
+const guessInput = document.getElementById('guessInput');
+const skipBtn = document.getElementById('skipBtn');
+const resetBtn = document.getElementById('resetBtn');
+const toast = document.getElementById('toast');
+const toastMsg = document.getElementById('toastMsg');
+const confettiBox = document.getElementById('confetti');
+const cardFrame = document.getElementById('cardFrame');
+const autocompleteDiv = document.getElementById('autocomplete');
+const wrongGuessesDiv = document.getElementById('wrongGuesses');
+const wrongGuessesTitle = document.getElementById('wrongGuessesTitle');
+const toggleBtn = document.getElementById('toggleMotionBtn');
+
+// Initialize game
+currentImage.crossOrigin = 'anonymous';
+loadCurrentCard();
+updateUI();
+
+// Animation toggle functionality
+toggleBtn.addEventListener('click', () => {
+  const isActive = toggleBtn.classList.contains('active');
+  if (isActive) {
+    document.documentElement.removeAttribute('data-reduced-motion');
+    toggleBtn.classList.remove('active');
+  } else {
+    document.documentElement.setAttribute('data-reduced-motion', 'true');
+    toggleBtn.classList.add('active');
+  }
+});
+
+// Utility functions
+function shuffle(arr) {
+  const newArr = [...arr];
+  for (let i = newArr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+  }
+  return newArr;
+}
+
+function currentCard() {
+  return DECK[order[cursor % order.length]];
+}
+
+function nextCard() {
+  cursor++;
+  round++;
+  nextTag.style.display = 'none';
+  
+  if (cursor % order.length === 0) {
+    order = shuffle(order);
+  }
+  
+  loadCurrentCard();
+  updateUI();
+}
+
+function loadCurrentCard() {
+  const card = currentCard();
+  currentImage = new Image();
+  currentImage.crossOrigin = 'anonymous';
+  currentImage.onload = () => {
+    requestAnimationFrame(() => {
+      drawPixelated(currentImage, difficultyPixels);
+    });
+  };
+  currentImage.onerror = () => {
+    console.error('Failed to load image:', card.src);
+  };
+  currentImage.src = card.src;
+}
+
+function drawPixelated(img, pixels) {
+  const aspect = 3 / 4;
+  const targetBlocks = Math.max(6, Math.min(pixels, MAX_PIXELS));
+  let cols = Math.max(3, Math.round(Math.sqrt(targetBlocks * aspect)));
+  let rows = Math.max(2, Math.round(cols / aspect));
+  
+  const offCanvas = document.createElement('canvas');
+  offCanvas.width = cols;
+  offCanvas.height = rows;
+  const offCtx = offCanvas.getContext('2d');
+  
+  const { sx, sy, sw, sh } = cover(img.width, img.height, cols, rows);
+  
+  offCtx.drawImage(img, sx, sy, sw, sh, 0, 0, cols, rows);
+  
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(offCanvas, 0, 0, cols, rows, 0, 0, canvas.width, canvas.height);
+  
+  pixelInfo.textContent = targetBlocks;
+}
+
+function cover(srcW, srcH, destW, destH) {
+  const srcRatio = srcW / srcH;
+  const destRatio = destW / destH;
+  let newW, newH;
+  
+  if (destRatio > srcRatio) {
+    newW = srcW;
+    newH = srcW / destRatio;
+  } else {
+    newH = srcH;
+    newW = srcH * destRatio;
+  }
+  
+  const sx = (srcW - newW) / 2;
+  const sy = (srcH - newH) / 2;
+  
+  return { sx, sy, sw: newW, sh: newH };
+}
+
+// Form handling
+guessForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const guess = guessInput.value.trim();
+  
+  if (!guess) return;
+
+  const allAliases = DECK.flatMap(c => c.aliases.map(a => a.toLowerCase()));
+  if (!allAliases.includes(guess.toLowerCase())) {
+    notify("Invalid card name! Try typing for suggestions.", 2000);
+    guessInput.classList.add('shake');
+    setTimeout(() => guessInput.classList.remove('shake'), 500);
+    return;
+  }
+
+  const card = currentCard();
+  const isCorrect = card.aliases.some(a => a.toLowerCase() === guess.toLowerCase());
+  
+  if (isCorrect) {
+    handleCorrectGuess();
+  } else {
+    handleWrongGuess(guess);
+  }
+
+  guessInput.value = '';
+  clearAutocomplete();
+});
+
+// Button event listeners
+skipBtn.addEventListener('click', () => {
+  notify(`The card was: ${currentCard().name}`, 3000);
+  revealCard();
+  resetDifficulty();
+  setTimeout(() => nextCard(), 2000);
+});
+
+resetBtn.addEventListener('click', () => {
+  if (confirm('Are you sure you want to restart the game?')) {
+    location.reload();
+  }
+});
+
+// Game logic
+function handleCorrectGuess() {
+  playCorrectAnimation();
+  score++;
+  notify('Correct! Well done!', 2000);
+  
+  revealCard();
+  resetDifficulty();
+  clearWrongGuesses();
+
+  nextTag.style.display = 'block';
+  setTimeout(() => nextCard(), 2000);
+}
+
+function handleWrongGuess(guess) {
+  playWrongAnimation();
+  notify('Wrong! The card becomes clearer.', 1500);
+  increaseDifficulty();
+  drawPixelated(currentImage, difficultyPixels);
+
+  const card = DECK.find(c => 
+    c.aliases.some(a => a.toLowerCase() === guess.toLowerCase())
+  );
+  
+  if (card && !wrongGuesses.includes(card.name)) {
+    addWrongGuess(card);
+  }
+}
+
+function addWrongGuess(card) {
+  wrongGuesses.push(card.name);
+  
+  // Show title if first wrong guess
+  if (wrongGuesses.length === 1) {
+    wrongGuessesTitle.classList.add('show');
+  }
+  
+  const item = document.createElement('div');
+  item.className = 'guess-item';
+  item.style.animationDelay = `${wrongGuesses.length * 0.15}s`;
+  
+  item.innerHTML = `
+    <img src="${card.src}" alt="${card.name}" loading="lazy">
+    <span>${card.name}</span>
+  `;
+  
+  wrongGuessesDiv.appendChild(item);
+}
+
+function clearWrongGuesses() {
+  wrongGuesses = [];
+  wrongGuessesDiv.innerHTML = '';
+  wrongGuessesTitle.classList.remove('show');
+}
+
+function revealCard() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+}
+
+function resetDifficulty() {
+  difficultyPixels = START_PIXELS;
+  updateUI();
+}
+
+function increaseDifficulty() {
+  difficultyPixels = Math.min(MAX_PIXELS, difficultyPixels + PIXEL_STEP);
+  updateUI();
+}
+
+function updateUI() {
+  scoreEl.textContent = score;
+  roundEl.textContent = round;
+  pixelInfo.textContent = difficultyPixels;
+  
+  const percentage = Math.min(100, (difficultyPixels / MAX_PIXELS) * 100);
+  diffBar.style.width = `${percentage}%`;
+  
+  statusText.textContent = `Visibility: ${difficultyPixels} pixels`;
+}
+
+// Enhanced notification system
+function notify(msg, duration = 2000) {
+  toastMsg.textContent = msg;
+  toast.style.display = 'grid';
+  toast.classList.add('show');
+  
+  clearTimeout(window.notifyTimeout);
+  window.notifyTimeout = setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 400);
+  }, duration);
+}
+
+// Enhanced animation functions
+function playWrongAnimation() {
+  cardFrame.classList.remove('shake');
+  requestAnimationFrame(() => {
+    cardFrame.classList.add('shake');
+    setTimeout(() => cardFrame.classList.remove('shake'), 600);
+  });
+}
+
+function playCorrectAnimation() {
+  createAdvancedConfetti();
+  
+  // Card celebration animation
+  cardFrame.style.transform = 'scale(1.05) rotateY(5deg)';
+  cardFrame.style.boxShadow = '0 30px 60px rgba(0,0,0,0.4), 0 0 100px rgba(78, 125, 255, 0.4)';
+  
+  setTimeout(() => {
+    cardFrame.style.transform = '';
+    cardFrame.style.boxShadow = '';
+  }, 800);
+}
+
+// Advanced confetti system with multiple particle types
+function createAdvancedConfetti() {
+  confettiBox.innerHTML = '';
+  
+  const particleCount = 60;
+  const colors = [
+    '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57',
+    '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43'
+  ];
+  
+  for (let i = 0; i < particleCount; i++) {
+    createConfettiParticle(colors, i);
+  }
+  
+  // Create special star particles
+  for (let i = 0; i < 15; i++) {
+    createStarParticle(i + particleCount);
+  }
+  
+  setTimeout(() => confettiBox.innerHTML = '', 1500);
+}
+
+function createConfettiParticle(colors, index) {
+  const particle = document.createElement('div');
+  const isRound = Math.random() > 0.5;
+  const size = 4 + Math.random() * 8;
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  
+  particle.className = 'confetti-particle';
+  particle.style.cssText = `
+    left: ${40 + Math.random() * 20}%;
+    top: ${40 + Math.random() * 20}%;
+    width: ${size}px;
+    height: ${size}px;
+    background: ${color};
+    border-radius: ${isRound ? '50%' : '2px'};
+    box-shadow: 0 0 6px ${color}aa;
+  `;
+  
+  confettiBox.appendChild(particle);
+  
+  const angle = (Math.random() - 0.5) * Math.PI;
+  const velocity = 150 + Math.random() * 300;
+  const x = Math.cos(angle) * velocity;
+  const y = Math.sin(angle) * velocity - 100;
+  const rotation = Math.random() * 1080;
+  const duration = 1000 + Math.random() * 500;
+  
+  particle.animate([
+    {
+      transform: 'translate(0, 0) rotate(0deg) scale(1)',
+      opacity: 1
+    },
+    {
+      transform: `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(0.3)`,
+      opacity: 0
+    }
+  ], {
+    duration,
+    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+    delay: index * 20
+  });
+}
+
+function createStarParticle(index) {
+  const star = document.createElement('div');
+  star.className = 'confetti-particle';
+  
+  const size = 8 + Math.random() * 6;
+  star.style.cssText = `
+    left: ${45 + Math.random() * 10}%;
+    top: ${45 + Math.random() * 10}%;
+    width: ${size}px;
+    height: ${size}px;
+    background: #ffd700;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    box-shadow: 0 0 12px #ffd700aa;
+  `;
+  
+  confettiBox.appendChild(star);
+  
+  const angle = Math.random() * Math.PI * 2;
+  const distance = 200 + Math.random() * 200;
+  const x = Math.cos(angle) * distance;
+  const y = Math.sin(angle) * distance;
+  const rotation = Math.random() * 720;
+  
+  star.animate([
+    {
+      transform: 'translate(0, 0) rotate(0deg) scale(1)',
+      opacity: 1,
+      filter: 'brightness(1)'
+    },
+    {
+      transform: `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(0.2)`,
+      opacity: 0,
+      filter: 'brightness(2)'
+    }
+  ], {
+    duration: 1200,
+    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+    delay: index * 30
+  });
+}
+
+// Autocomplete functionality
+function clearAutocomplete() {
+  clearTimeout(autocompleteTimeout);
+  autocompleteDiv.innerHTML = '';
+}
+
+guessInput.addEventListener('input', (e) => {
+  clearTimeout(autocompleteTimeout);
+  
+  const query = e.target.value.trim().toLowerCase();
+  
+  if (!query) {
+    clearAutocomplete();
+    return;
+  }
+
+  autocompleteTimeout = setTimeout(() => {
+    showAutocomplete(query);
+  }, 150);
+});
+
+function showAutocomplete(query) {
+  const matches = DECK.filter(card => {
+    const nameMatch = card.name.toLowerCase().includes(query);
+    const aliasMatch = card.aliases?.some(alias => 
+      alias.toLowerCase().includes(query)
+    );
+    return nameMatch || aliasMatch;
+  }).slice(0, 8);
+
+  autocompleteDiv.innerHTML = '';
+
+  matches.forEach((card, index) => {
+    const item = document.createElement('div');
+    item.className = 'autocomplete-item';
+    item.style.animationDelay = `${index * 0.05}s`;
+
+    const img = document.createElement('img');
+    img.src = card.src;
+    img.alt = card.name;
+    img.loading = 'lazy';
+
+    const span = document.createElement('span');
+    span.textContent = card.name;
+
+    item.appendChild(img);
+    item.appendChild(span);
+
+    item.addEventListener('click', () => {
+      guessInput.value = card.name;
+      clearAutocomplete();
+      guessInput.focus();
+    });
+
+    autocompleteDiv.appendChild(item);
+  });
+}
+
+// Hide autocomplete when clicking outside
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#autocomplete') && e.target !== guessInput) {
+    clearAutocomplete();
+  }
+});
+
+// Keyboard navigation for autocomplete
+guessInput.addEventListener('keydown', (e) => {
+  const items = autocompleteDiv.querySelectorAll('.autocomplete-item');
+  let selectedIndex = Array.from(items).findIndex(item => 
+    item.classList.contains('selected')
+  );
+
+  switch (e.key) {
+    case 'ArrowDown':
+      e.preventDefault();
+      selectedIndex = (selectedIndex + 1) % items.length;
+      updateSelection(items, selectedIndex);
+      break;
+    case 'ArrowUp':
+      e.preventDefault();
+      selectedIndex = selectedIndex <= 0 ? items.length - 1 : selectedIndex - 1;
+      updateSelection(items, selectedIndex);
+      break;
+    case 'Enter':
+      if (selectedIndex >= 0) {
+        e.preventDefault();
+        items[selectedIndex].click();
+      }
+      break;
+    case 'Escape':
+      clearAutocomplete();
+      break;
+  }
+});
+
+function updateSelection(items, selectedIndex) {
+  items.forEach((item, index) => {
+    item.classList.toggle('selected', index === selectedIndex);
+  });
+}
+
+// Performance optimizations - preload images
+function preloadNextImages() {
+  const nextCards = [];
+  for (let i = 1; i <= 3; i++) {
+    const nextIndex = (cursor + i) % order.length;
+    nextCards.push(DECK[order[nextIndex]]);
+  }
+  
+  nextCards.forEach(card => {
+    const img = new Image();
+    img.src = card.src;
+  });
+}
+
+setTimeout(preloadNextImages, 1000);
+
+// Error handling
+window.addEventListener('error', (e) => {
+  console.error('Game error:', e.error);
+  notify('An error occurred. Please refresh the page.', 3000);
+});
+
+// Responsive canvas handling
+function handleResize() {
+  if (currentImage.complete && currentImage.naturalWidth > 0) {
+    drawPixelated(currentImage, difficultyPixels);
+  }
+}
+
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(handleResize, 250);
+});
+
+// Add some extra visual polish with CSS custom properties
+document.documentElement.style.setProperty('--game-hue', Math.floor(Math.random() * 360));
+</script>
+</body>
+</html>
