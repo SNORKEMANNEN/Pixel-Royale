@@ -11,7 +11,3 @@
 -  **CSS3** (animations + Royale theme)  
 -  **Vanilla JavaScript** (no frameworks)  
 
----
-
-##  License  
-This project is open-source and available under the **MIT License**.  
