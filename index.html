@@ -19,712 +19,881 @@
       --success:#27c46b;
       --danger:#ff4d4d;
       --card-bg:#0d142b;
-      --purple-glow:#8b5cf6;
-      --cyan-glow:#06b6d4;
+      --neon-pink: #ff0080;
+      --neon-cyan: #00ffff;
+      --electric-purple: #8a2be2;
     }
 
-    :root[data-reduced-motion="true"] *,
-    :root[data-reduced-motion="true"] *::before,
-    :root[data-reduced-motion="true"] *::after {
+    /* Graphics quality handling */
+    :root[data-graphics="low"] *,
+    :root[data-graphics="low"] *::before,
+    :root[data-graphics="low"] *::after {
       animation: none !important;
-      transition: none !important;
+      transition: opacity 0.2s ease, transform 0.2s ease !important;
+      backdrop-filter: none !important;
+      filter: none !important;
+    }
+
+    :root[data-graphics="low"] .stars,
+    :root[data-graphics="low"] .particles,
+    :root[data-graphics="low"] .frame::before {
+      display: none !important;
+    }
+
+    :root[data-graphics="low"] .frame {
+      background: var(--royal-blue-dark) !important;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+    }
+
+    :root[data-graphics="low"] .topbar,
+    :root[data-graphics="low"] .stage,
+    :root[data-graphics="low"] .sidebar {
+      background: rgba(13, 20, 43, 0.9) !important;
+      backdrop-filter: none !important;
     }
 
     @font-face {
-    font-family: 'Clash';
-    src: url('Clash-Regular.woff2') format('woff2'),
-        url('Clash-Regular.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
+      font-family: 'Clash';
+      src: url('Clash-Regular.woff2') format('woff2'),
+          url('Clash-Regular.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
   
     *{box-sizing:border-box}
     html,body{
       height:100%;
-      background: radial-gradient(1200px 700px at 20% -10%, #3c6eff 0%, rgba(60,110,255,0) 60%),
+      background: 
+        radial-gradient(circle at 15% 20%, rgba(255, 0, 128, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 85% 80%, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(1200px 700px at 20% -10%, #3c6eff 0%, rgba(60,110,255,0) 60%),
         radial-gradient(900px 600px at 100% 0%, #1a2a6b 0%, rgba(26,42,107,0) 60%), 
         linear-gradient(180deg, #0b1020, #141b35);
     }
-    body{
-      margin:0;
-      color:#eef2ff;
-      font-family:Clash,system-ui,Segoe UI,Roboto,Helvetica,Arial;
-      overflow-x: hidden;
-    }
-    
+    body{margin:0;color:#eef2ff;font-family:Clash,system-ui,Segoe UI,Roboto,Helvetica,Arial;overflow-x:hidden;}
+
+    /* Enhanced animated starfield */
     .stars{
       position:fixed;
       inset:0;
       pointer-events:none;
       z-index:0;
-      background-image:radial-gradient(2px 2px at 20% 30%,#fff8,transparent),
+      background-image:
+        radial-gradient(2px 2px at 20% 30%,#fff8,transparent),
         radial-gradient(1.5px 1.5px at 70% 20%,#fff6,transparent),
         radial-gradient(2px 2px at 40% 70%,#fff7,transparent),
-        radial-gradient(1px 1px at 80% 80%,#fff5,transparent),
-        radial-gradient(2.5px 2.5px at 10% 60%,#fff7,transparent);
-      animation: twinkle 8s ease-in-out infinite;
+        radial-gradient(1px 1px at 90% 40%,#ff008055,transparent),
+        radial-gradient(1px 1px at 10% 80%,#00ffff55,transparent);
+      animation: twinkle 6s ease-in-out infinite, starMove 20s linear infinite;
     }
+    
     @keyframes twinkle{
-      0%, 100% { filter:brightness(1) }
-      25% { filter:brightness(1.4) }
-      50% { filter:brightness(1.1) }
-      75% { filter:brightness(1.3) }
+      0%, 100%{filter:brightness(1) hue-rotate(0deg)}
+      25%{filter:brightness(1.3) hue-rotate(90deg)}
+      50%{filter:brightness(0.8) hue-rotate(180deg)}
+      75%{filter:brightness(1.1) hue-rotate(270deg)}
+    }
+    
+    @keyframes starMove{
+      0%{transform:translateY(0px)}
+      100%{transform:translateY(-10px)}
+    }
+
+    /* Floating particles */
+    .particles{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .particle{
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: float 8s linear infinite;
+    }
+
+    @keyframes float{
+      0%{
+        transform: translateY(100vh) translateX(0px) scale(0);
+        opacity: 0;
+      }
+      10%{
+        opacity: 0.6;
+        transform: scale(1);
+      }
+      90%{
+        opacity: 0.6;
+      }
+      100%{
+        transform: translateY(-10vh) translateX(50px) scale(0);
+        opacity: 0;
+      }
     }
 
     .wrap{
       position:relative;
       z-index:1;
       min-height:100vh;
-      display:grid;
-      place-items:center;
-      padding:20px;
-      width: 100%;
+      display:flex;
+      flex-direction: column;
+      justify-content: center;
+      padding:10px;
+      animation: slideIn 0.8s ease-out;
     }
-    
+
+    @keyframes slideIn{
+      0%{opacity:0; transform:translateY(30px)}
+      100%{opacity:1; transform:translateY(0)}
+    }
+
     .frame{
-      width:min(1200px,95vw);
+      width:min(1000px,98vw);
       max-width: 100%;
-      background:linear-gradient(135deg, var(--royal-blue-dark), var(--royal-blue-deep), #0a1325); 
-      border-radius:32px; 
-      padding:28px; 
-      box-shadow:0 40px 120px #0006, inset 0 0 0 3px #ffffff15, 0 0 60px #4f46e520; 
+      margin: 0 auto;
+      background:linear-gradient(135deg, var(--royal-blue-dark), var(--royal-blue-deep)); 
+      border-radius:20px; 
+      padding:16px; 
+      box-shadow:
+        0 25px 60px rgba(0,0,0,0.3), 
+        inset 0 0 0 2px rgba(255,255,255,0.1),
+        0 0 40px rgba(59, 130, 246, 0.15); 
       position:relative; 
       overflow:hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255,255,255,0.1);
+      transition: all 0.3s ease;
     }
-    
-    .frame::before {
+
+    .frame:hover{
+      transform: translateY(-2px);
+      box-shadow:
+        0 35px 80px rgba(0,0,0,0.4), 
+        inset 0 0 0 2px rgba(255,255,255,0.15),
+        0 0 60px rgba(59, 130, 246, 0.2);
+    }
+
+    .frame::before{
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 100px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%);
-      border-radius: 32px 32px 0 0;
-      pointer-events: none;
+      height: 2px;
+      background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan), var(--electric-purple));
+      animation: neonPulse 3s ease-in-out infinite;
     }
-    
+
+    @keyframes neonPulse{
+      0%, 100%{opacity: 0.5}
+      50%{opacity: 1}
+    }
+
     .topbar{
       display:flex;
       align-items:center;
       justify-content:space-between; 
-      gap:16px; 
-      padding:16px 22px; 
-      border-radius:24px; 
-      background:linear-gradient(135deg,#2c448f,#16245e, #0f1a42); 
-      box-shadow: inset 0 0 0 2px #ffffff10, 0 12px 24px #0008, 0 0 30px #4f46e515;
-      flex-wrap: wrap;
-      position: relative;
-      overflow: hidden;
+      gap:12px; 
+      padding:12px 16px; 
+      border-radius:16px; 
+      background:linear-gradient(135deg,rgba(44, 68, 143, 0.8),rgba(22, 36, 94, 0.9)); 
+      box-shadow: 
+        inset 0 0 0 2px rgba(0,0,0,0.1), 
+        0 8px 20px rgba(0,0,0,0.2),
+        0 0 15px rgba(59, 130, 246, 0.1);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.1);
     }
 
-    .topbar::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 50%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%);
-      pointer-events: none;
-    }
-    
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      min-width: 0;
-    }
-    
+    .brand{display:flex;align-items:center;gap:12px}
     .brand .logo {
-      width: 68px;
-      height: 68px;
-      flex-shrink: 0;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-      transition: transform 0.3s ease;
+      width: 64px;
+      height: 64px;
+      filter: drop-shadow(0 0 8px rgba(255, 204, 51, 0.5));
+      transition: all 0.3s ease;
+    }
+    .brand .logo:hover{
+      transform: scale(1.05) rotate(5deg);
+      filter: drop-shadow(0 0 12px rgba(255, 204, 51, 0.8));
     }
 
-    .brand .logo:hover {
-      transform: scale(1.05) rotate(2deg);
-    }
-    
-    .stats{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap: wrap;
-    }
-    
+    .stats{display:flex;align-items:center;gap:10px;flex-wrap: wrap}
     .pill{
       display:flex;
       align-items:center;
       gap:8px; 
-      padding:10px 16px; 
+      padding:8px 12px; 
       border-radius:999px; 
-      background:linear-gradient(135deg,#143088,#0c1a55, #081238); 
-      box-shadow:inset 0 0 0 2px #ffffff15, 0 4px 8px #00000030;
-      white-space: nowrap;
-      font-size: 14px;
-      font-weight: 600;
-      border: 1px solid rgba(255,255,255,0.1);
+      background:linear-gradient(135deg,rgba(20, 48, 136, 0.9),rgba(12, 26, 85, 0.9)); 
+      box-shadow:inset 0 0 0 2px rgba(0,0,0,0.2), 0 4px 10px rgba(0,0,0,0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.08);
       transition: all 0.3s ease;
+      font-size: 14px;
     }
-
-    .pill:hover {
+    .pill:hover{
       transform: translateY(-1px);
-      box-shadow:inset 0 0 0 2px #ffffff25, 0 6px 12px #00000040;
+      box-shadow:inset 0 0 0 2px rgba(0,0,0,0.2), 0 6px 15px rgba(0,0,0,0.25);
     }
-
     .pill b{
-      color:#ffd95a; 
-      text-shadow:0 2px 4px #000;
-      font-weight: 800;
+      color:#ffe27a; 
+      text-shadow:0 2px 4px rgba(0,0,0,0.5);
+      font-size: 1em;
     }
 
     .main{
       display:grid; 
-      grid-template-columns:1.2fr 0.8fr; 
-      gap:28px; 
-      margin-top:24px;
-      align-items: start;
+      grid-template-columns:1fr 0.7fr; 
+      gap:16px; 
+      margin-top:16px;
+      min-height: 420px;
     }
     
-    @media (max-width:1000px){
-      .main{grid-template-columns:1fr;} 
-      .frame{padding:20px; border-radius: 24px;}
-      .brand .logo {width: 56px; height: 56px;}
-      .topbar {padding: 12px 18px;}
-      .pill {padding: 8px 14px; font-size: 13px;}
+    @media (max-width:900px){
+      .main{grid-template-columns:1fr; gap:16px} 
+      .frame{padding:12px}
     }
 
     .stage{
-      background:linear-gradient(135deg,#0d142b,#101a3f, #0a1226); 
-      border-radius:28px; 
-      padding:24px; 
-      box-shadow:inset 0 0 0 3px #ffffff10, 0 20px 40px #00000020;
+      background:linear-gradient(135deg,rgba(13, 20, 43, 0.9),rgba(16, 26, 63, 0.8)); 
+      border-radius:20px; 
+      padding:16px; 
+      box-shadow:
+        inset 0 0 0 2px rgba(0,0,0,0.1),
+        0 15px 25px rgba(0,0,0,0.15),
+        0 0 20px rgba(13, 20, 43, 0.3);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.05);
       position: relative;
       overflow: hidden;
     }
 
-    .stage::before {
+    .stage::before{
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%);
-      border-radius: 28px 28px 0 0;
+      inset: 0;
+      background: linear-gradient(45deg, transparent 49%, rgba(255,255,255,0.03) 50%, transparent 51%);
+      pointer-events: none;
     }
       
+    /* Optimized card area */
     .card-frame {
       width: 100%;
-      max-width: 350px;
+      max-width: 280px;
       aspect-ratio: 3/4;
-      margin: 0 auto 24px auto;
+      margin: 0 auto;
       position: relative;
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 20px 40px #00000030, 0 0 60px #4f46e515;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 15px 35px rgba(0,0,0,0.3),
+        0 0 25px rgba(13, 20, 43, 0.5);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .card-frame:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 30px 60px #00000040, 0 0 80px #4f46e520;
+    .card-frame:hover{
+      transform: scale(1.02) translateY(-3px);
+      box-shadow: 
+        0 25px 50px rgba(0,0,0,0.4),
+        0 0 40px rgba(13, 20, 43, 0.7);
+    }
+
+    .card-frame.revealed {
+      box-shadow: 
+        0 15px 35px rgba(0,0,0,0.3),
+        0 0 40px rgba(39, 196, 107, 0.6),
+        inset 0 0 20px rgba(39, 196, 107, 0.2);
     }
 
     canvas#pixelCanvas {
       width: 100%;
       height: 100%;
       display:block;
-      border-radius:16px;
       background: var(--card-bg);
-    }
-
-    /* Enhanced Wrong Guesses Section */
-    .wrong-guesses-section {
-      margin-top: 20px;
-    }
-
-    .wrong-guesses-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #ff9999;
-      text-align: center;
-      margin-bottom: 16px;
-      opacity: 0;
-      transform: translateY(-10px);
-      transition: all 0.4s ease;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-
-    .wrong-guesses-title.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    #wrongGuesses {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-      gap: 16px;
-      justify-items: center;
-      min-height: 0;
-      padding: 0 8px;
-    }
-
-    .guess-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-size: 11px;
-      opacity: 0;
-      transform: scale(0.3) translateY(40px) rotateX(90deg);
-      background: linear-gradient(135deg, rgba(255, 77, 77, 0.15), rgba(139, 92, 246, 0.1));
-      padding: 12px 8px;
-      border-radius: 12px;
-      border: 2px solid rgba(255, 77, 77, 0.3);
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative;
-      overflow: hidden;
-      backdrop-filter: blur(10px);
-      animation: guessItemEntry 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-
-    .guess-item::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(255,255,255,0.2) 50%, 
-        transparent 100%);
-      transition: left 0.6s ease;
-    }
-
-    .guess-item:hover::before {
-      left: 100%;
-    }
-
-    .guess-item:hover {
-      transform: scale(1.1) translateY(-4px);
-      background: linear-gradient(135deg, rgba(255, 77, 77, 0.25), rgba(139, 92, 246, 0.2));
-      border-color: rgba(255, 77, 77, 0.5);
-      box-shadow: 0 12px 24px rgba(255, 77, 77, 0.2), 0 0 30px rgba(139, 92, 246, 0.1);
-    }
-
-    .guess-item img {
-      width: 56px;
-      height: 74px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 6px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       transition: all 0.3s ease;
     }
 
-    .guess-item:hover img {
+    /* Optimized wrong guesses */
+    #wrongGuesses {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      gap: 8px;
+      justify-items: center;
+      max-height: 120px;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    #wrongGuesses::-webkit-scrollbar {
+      display: none;
+    }
+
+    #wrongGuesses div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 10px;
+      padding: 6px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(255, 77, 77, 0.1), rgba(139, 69, 19, 0.1));
+      border: 1px solid rgba(255, 77, 77, 0.3);
+      transition: all 0.3s ease;
+      animation: wrongSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    #wrongGuesses div:hover{
       transform: scale(1.05);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+      background: linear-gradient(135deg, rgba(255, 77, 77, 0.2), rgba(139, 69, 19, 0.2));
     }
 
-    .guess-item span {
-      text-align: center;
-      line-height: 1.3;
-      color: #ffcccc;
-      font-weight: 600;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    }
-
-    @keyframes guessItemEntry {
-      0% {
+    @keyframes wrongSlideIn{
+      0%{
         opacity: 0;
-        transform: scale(0.3) translateY(40px) rotateX(90deg);
+        transform: scale(0.5) translateY(20px);
       }
-      60% {
+      100%{
         opacity: 1;
-        transform: scale(1.1) translateY(-8px) rotateX(-5deg);
+        transform: scale(1) translateY(0);
       }
-      80% {
-        transform: scale(0.95) translateY(2px) rotateX(2deg);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1) translateY(0) rotateX(0deg);
-      }
+    }
+
+    #wrongGuesses img {
+      width: 40px;
+      height: auto;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+
+    #wrongGuesses img:hover{
+      transform: scale(1.1);
     }
 
     .next-tag{
       position:absolute; 
-      top:12px; 
-      right:-70px; 
-      transform:rotate(35deg); 
-      background:linear-gradient(135deg,var(--gold),var(--gold-deep), #b8860b); 
-      color:#2d1600; 
-      font-weight:900; 
-      padding:8px 80px; 
-      box-shadow:0 12px 24px #00000040, 0 0 30px rgba(255,204,51,0.3); 
-      text-shadow:0 1px 2px rgba(0,0,0,0.3); 
-      border-radius:10px;
+      top:10px; 
+      right:-50px; 
+      transform:rotate(30deg); 
+      background:linear-gradient(135deg,var(--gold),var(--gold-deep)); 
+      color:#381f00; 
+      font-weight:800; 
+      padding:6px 60px; 
+      box-shadow:0 6px 15px rgba(0,0,0,0.3); 
+      text-shadow:none; 
+      border-radius:8px;
+      animation: tagPulse 2s ease-in-out infinite;
       font-size: 14px;
-      letter-spacing: 0.5px;
-      border: 2px solid rgba(255,255,255,0.2);
     }
 
+    @keyframes tagPulse{
+      0%, 100%{transform: rotate(30deg) scale(1)}
+      50%{transform: rotate(30deg) scale(1.05)}
+    }
+
+    /* Optimized sidebar */
     .sidebar{
-      background:linear-gradient(135deg,#0d142b,#121b3e, #0a1226); 
-      border-radius:28px; 
-      padding:24px; 
-      box-shadow:inset 0 0 0 3px #ffffff10, 0 20px 40px #00000020; 
+      background:linear-gradient(135deg,rgba(13, 20, 43, 0.9),rgba(18, 27, 62, 0.8)); 
+      border-radius:20px; 
+      padding:16px; 
+      box-shadow:
+        inset 0 0 0 2px rgba(0,0,0,0.1),
+        0 15px 25px rgba(0,0,0,0.15); 
       display:grid; 
-      gap:18px;
-      height: fit-content;
-      position: sticky;
-      top: 20px;
-      overflow: hidden;
-      position: relative;
+      gap:12px;
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.05);
+      align-content: start;
     }
 
-    .sidebar::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%);
-      border-radius: 28px 28px 0 0;
-    }
-
-    .guess-row{display:flex; gap:12px}
+    .guess-row{display:flex; gap:8px}
     .input{
       flex:1; 
-      background:linear-gradient(135deg, #0b132b, #0f1a3d); 
-      border:2px solid #1b2a5c; 
+      background:rgba(11, 19, 43, 0.8); 
+      border:2px solid rgba(27, 42, 92, 0.8); 
       color:#e7ecff; 
-      border-radius:16px; 
-      padding:16px 18px; 
+      border-radius:12px; 
+      padding:12px 14px; 
       outline:0; 
       font-weight:600; 
-      box-shadow:0 8px 20px #00000020, inset 0 2px 4px rgba(255,255,255,0.05); 
-      transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow:0 6px 12px rgba(0,0,0,0.15); 
+      transition:.3s ease;
+      backdrop-filter: blur(10px);
       font-family: inherit;
-      font-size: 15px;
+      font-size: 14px;
     }
     .input:focus{
       border-color:#4e7dff; 
-      box-shadow:0 12px 32px #00000030, 0 0 0 4px #4e7dff33, inset 0 2px 4px rgba(255,255,255,0.1);
-      transform: translateY(-2px);
+      box-shadow:0 8px 20px rgba(0,0,0,0.2), 0 0 0 3px rgba(78, 125, 255, 0.2);
+      transform: translateY(-1px);
     }
-    
+
     .btn{
       appearance:none; 
       border:0; 
-      background:linear-gradient(135deg,#ffd86b,#caa141, #b8941f); 
+      background:linear-gradient(135deg,#ffd86b,#caa141); 
       color:#2b1a00; 
-      font-family:"Clash"; 
+      font-family:inherit; 
       font-weight:900; 
-      letter-spacing:.4px; 
-      padding: 14px 22px; 
-      border-radius:16px; 
-      box-shadow:0 12px 0 #7d5a13, 0 20px 40px #00000030; 
+      letter-spacing:.5px; 
+      padding: 10px 16px; 
+      border-radius:12px; 
+      box-shadow:0 8px 0 #7d5a13, 0 12px 25px rgba(0,0,0,0.2); 
       transform:translateY(0); 
-      transition:all .3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow .15s ease;
+      transition:all .3s cubic-bezier(0.34, 1.56, 0.64, 1);
       cursor: pointer;
-      font-size: 14px;
-      white-space: nowrap;
       position: relative;
       overflow: hidden;
+      font-size: 14px;
     }
 
-    .btn::before {
+    .btn::before{
       content: '';
       position: absolute;
       top: 0;
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
       transition: left 0.5s ease;
     }
 
-    .btn:hover::before {
+    .btn:hover{
+      transform:translateY(-2px) scale(1.02); 
+      filter:saturate(1.2) brightness(1.1);
+      box-shadow:0 10px 0 #7d5a13, 0 16px 35px rgba(0,0,0,0.3);
+    }
+
+    .btn:hover::before{
       left: 100%;
     }
 
-    .btn:hover{
-      transform:translateY(-3px); 
-      filter:saturate(1.2) brightness(1.05);
-      box-shadow:0 15px 0 #7d5a13, 0 25px 50px #00000040;
-    }
     .btn:active{
-      transform:translateY(3px); 
-      box-shadow:0 6px 0 #7d5a13, 0 12px 24px #00000040
+      transform:translateY(2px) scale(0.98); 
+      box-shadow:0 4px 0 #7d5a13, 0 6px 12px rgba(0,0,0,0.25);
     }
 
-    .status{display:grid; gap:16px; font-size:14px}
+    /* Compact status section */
+    .status{display:grid; gap:8px; font-size:13px}
     .bar{
-      height:14px; 
-      background:linear-gradient(135deg, #0a1433, #0f1a42); 
-      border:2px solid #ffffff15; 
+      height:12px; 
+      background:rgba(10, 20, 51, 0.8); 
+      border:2px solid rgba(0,0,0,0.2); 
       border-radius:999px; 
       overflow:hidden;
       box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
     }
     .bar > div{
       height:100%; 
-      background:linear-gradient(90deg,#46f28f,#2cd2ff, #8b5cf6); 
+      background:linear-gradient(90deg,#46f28f,#2cd2ff,#ff6b9d); 
       width:0;
-      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 0 20px rgba(70, 242, 143, 0.3);
+      transition: all 0.5s ease;
+      position: relative;
+      overflow: hidden;
     }
 
+    .bar > div::after{
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: barShimmer 2s linear infinite;
+    }
+
+    @keyframes barShimmer{
+      0%{transform: translateX(-100%)}
+      100%{transform: translateX(100%)}
+    }
+
+    /* Enhanced toast */
     .toast{
       position:fixed; 
-      inset:auto 0 32px 0; 
+      inset:auto 0 20px 0; 
       display:grid; 
       place-items:center; 
       pointer-events:none; 
-      z-index:1000;
+      z-index:100;
     }
     .toast .msg{
       pointer-events:auto; 
-      padding:16px 24px; 
-      border-radius:16px; 
-      background:linear-gradient(135deg, #0d142b, #1a2545); 
-      border:2px solid #1b2a5c; 
-      box-shadow:0 20px 60px #000000aa, 0 0 40px rgba(78, 125, 255, 0.2);
-      transform: translateY(100px) scale(0.9);
-      opacity: 0;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      padding:12px 20px; 
+      border-radius:12px; 
+      background:rgba(13, 20, 43, 0.95); 
+      border:2px solid rgba(27, 42, 92, 0.8); 
+      box-shadow:0 15px 35px rgba(0,0,0,0.3);
       backdrop-filter: blur(20px);
+      animation: toastSlideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-weight: 600;
-    }
-
-    .toast.show .msg {
-      transform: translateY(0) scale(1);
-      opacity: 1;
-    }
-
-    .shake{animation:shake .6s cubic-bezier(0.34, 1.56, 0.64, 1)}
-    @keyframes shake{
-      0%, 100%{transform:translateX(0)}
-      10%{transform:translateX(-6px) rotate(-1deg)}
-      20%{transform:translateX(6px) rotate(1deg)}
-      30%{transform:translateX(-8px) rotate(-1deg)}
-      40%{transform:translateX(8px) rotate(1deg)}
-      50%{transform:translateX(-6px) rotate(-0.5deg)}
-      60%{transform:translateX(6px) rotate(0.5deg)}
-      70%{transform:translateX(-4px)}
-      80%{transform:translateX(4px)}
-      90%{transform:translateX(-2px)}
-    }
-
-    /* Enhanced Confetti System */
-    .confetti{
-      position:absolute; 
-      inset:0; 
-      pointer-events:none; 
-      overflow:hidden;
-      border-radius: 16px;
-    }
-
-    .confetti-particle {
-      position: absolute;
-      pointer-events: none;
-      z-index: 100;
-    }
-
-    .hint{
-      font-size:12px; 
-      color:#a6b6ff;
-      opacity: 0.8;
       text-align: center;
+      font-size: 14px;
     }
-    
-    .footer{
-      opacity:.85; 
-      text-align:center; 
-      font-size:12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
-    .footer a{color:#9ec1ff; transition: color 0.3s ease;}
-    .footer a:hover{color:#fff;}
 
-    /* Improved Autocomplete */
+    @keyframes toastSlideUp{
+      0%{
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+      }
+      100%{
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Enhanced animations */
+    .shake{animation:enhancedShake .8s ease-in-out}
+    @keyframes enhancedShake{
+      0%, 100%{transform:translateX(0) rotate(0deg)}
+      10%{transform:translateX(-8px) rotate(-2deg)}
+      20%{transform:translateX(8px) rotate(2deg)}
+      30%{transform:translateX(-12px) rotate(-3deg)}
+      40%{transform:translateX(12px) rotate(3deg)}
+      50%{transform:translateX(-8px) rotate(-2deg)}
+      60%{transform:translateX(8px) rotate(2deg)}
+      70%{transform:translateX(-4px) rotate(-1deg)}
+      80%{transform:translateX(4px) rotate(1deg)}
+      90%{transform:translateX(-2px) rotate(0deg)}
+    }
+
+    .success-glow{
+      animation: successGlow 1.5s ease-out;
+    }
+
+    @keyframes successGlow{
+      0%{
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3), 0 0 25px rgba(13, 20, 43, 0.5);
+      }
+      50%{
+        box-shadow: 
+          0 15px 35px rgba(0,0,0,0.3), 
+          0 0 40px rgba(39, 196, 107, 0.8),
+          inset 0 0 20px rgba(39, 196, 107, 0.3);
+      }
+      100%{
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3), 0 0 25px rgba(13, 20, 43, 0.5);
+      }
+    }
+
+    .confetti{position:absolute; inset:0; pointer-events:none; overflow:hidden; border-radius: 16px;}
+
+    /* Loading screen */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #0b1020, #141b35);
+      display: grid;
+      place-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.5s ease;
+    }
+
+    .loading-screen.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .loading-content {
+      text-align: center;
+      color: #eef2ff;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 204, 51, 0.3);
+      border-top: 4px solid #ffcc33;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Compact autocomplete */
     #autocomplete {
       display: grid;
-      gap: 6px;
-      max-height: 240px;
+      gap: 4px;
+      max-height: 180px;
       overflow-y: auto;
-      -ms-overflow-style: none;
       scrollbar-width: none;
-      padding: 4px;
+      -ms-overflow-style: none;
     }
 
-    #autocomplete::-webkit-scrollbar { display: none; }
+    #autocomplete::-webkit-scrollbar {
+      display: none;
+    }
 
     .autocomplete-item {
       display: flex;
       align-items: center;
       gap: 10px;
       padding: 8px 12px;
-      font-size: 14px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #143088, #0c1a55, #081238);
+      font-size: 0.85rem;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(20, 48, 136, 0.6), rgba(12, 26, 85, 0.8));
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      border: 1px solid rgba(255,255,255,0.1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .autocomplete-item::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
-      transition: left 0.5s ease;
+      animation: autocompleteSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 1px solid rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
     }
 
     .autocomplete-item img {
-      width: 36px;
-      height: 48px;
+      width: 32px;
+      height: 42px;
       object-fit: cover;
-      border-radius: 6px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      border-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
-    .autocomplete-item:hover {
-      background: linear-gradient(135deg, #2a5cff, #1a4ae6, #0f2db8);
-      transform: scale(1.02) translateY(-1px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), 0 0 20px rgba(42, 92, 255, 0.2);
-      border-color: rgba(255,255,255,0.2);
+    .autocomplete-item:hover, .autocomplete-item.selected {
+      background: linear-gradient(135deg, rgba(42, 92, 255, 0.7), rgba(4, 29, 130, 0.9));
+      transform: translateX(6px) scale(1.02);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+      border-color: rgba(78, 125, 255, 0.3);
     }
 
-    .autocomplete-item:hover::before { left: 100%; }
-
-    .autocomplete-item:active {
-      transform: scale(0.98); 
-      transition: transform 0.1s ease;
+    @keyframes autocompleteSlide {
+      0% {
+        opacity: 0;
+        transform: translateX(-20px) scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
     }
 
-    @keyframes popIn {
-      0% { transform: scale(0.8) translateY(20px); opacity: 0; }
-      60% { transform: scale(1.05) translateY(-4px); opacity: 1; }
-      100% { transform: scale(1) translateY(0); }
+    .hint{
+      font-size:11px; 
+      color:#a6b6ff;
+      opacity: 0.8;
+      text-align: center;
     }
 
-    #toggleLabel {
+    /* Compact settings section */
+    .settings-section {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(11, 19, 43, 0.6);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .settings-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffe27a;
+      text-align: center;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(20, 48, 136, 0.3);
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.3s ease;
+    }
+
+    .setting-row:hover {
+      background: rgba(20, 48, 136, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .setting-label {
       font-size: 12px;
       font-weight: 600;
-      color: #eaeaea;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-      cursor: pointer;
-      user-select: none;
-      transition: color 0.3s ease;
+      color: #e7ecff;
+      flex: 1;
     }
 
-    #toggleLabel:hover { color: #fff; }
-
-    #toggleMotionBtn {
+    .toggle-switch {
       position: relative;
-      width: 52px;
-      height: 26px;
-      border-radius: 20px;
+      width: 44px;
+      height: 22px;
+      border-radius: 11px;
       border: none;
       cursor: pointer;
       outline: none;
-      background: linear-gradient(145deg, #ff4444, #cc0000);
-      overflow: hidden;
-      vertical-align: middle;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.1);
+      background: linear-gradient(135deg, #ff4d4d, #cc3333);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex-shrink: 0;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
     }
 
-    #toggleMotionBtn::before {
+    .toggle-switch::before {
       content: "";
       position: absolute;
       top: 2px;
       left: 2px;
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(4px);
       border-radius: 50%;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.8);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        inset 0 0 4px rgba(255,255,255,0.4),
+        0 2px 6px rgba(0,0,0,0.3),
+        0 0 8px rgba(255,255,255,0.4);
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    #toggleMotionBtn.active {
-      background: linear-gradient(145deg, #00aa00, #006600);
+    .toggle-switch.active {
+      background: linear-gradient(135deg, #27c46b, #1ea653);
     }
 
-    #toggleMotionBtn.active::before {
-      transform: translateX(26px);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.8), 0 0 12px rgba(0, 255, 0, 0.3);
+    .toggle-switch.active::before {
+      transform: translateX(22px);
+      box-shadow: 
+        inset 0 0 4px rgba(255,255,255,0.4),
+        0 2px 6px rgba(0,0,0,0.3),
+        0 0 10px rgba(0,255,0,0.6);
     }
+
+    /* Compact graphics quality selection */
+    .graphics-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .graphics-option {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.1);
+      background: rgba(20, 48, 136, 0.4);
+      color: #e7ecff;
+      font-weight: 600;
+      font-size: 11px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      backdrop-filter: blur(8px);
+    }
+
+    .graphics-option:hover {
+      background: rgba(20, 48, 136, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .graphics-option.active {
+      border-color: #4e7dff;
+      background: linear-gradient(135deg, rgba(42, 92, 255, 0.6), rgba(4, 29, 130, 0.8));
+      color: #fff;
+      box-shadow: 0 0 15px rgba(78, 125, 255, 0.3);
+    }
+
+    .graphics-option.high {
+      border-left: 3px solid #27c46b;
+    }
+
+    .graphics-option.low {
+      border-left: 3px solid #ff6b6b;
+    }
+
+    .graphics-option div {
+      margin-top: 2px;
+      font-size: 9px;
+      opacity: 0.8;
+    }
+
+    .footer{
+      opacity:.85; 
+      text-align:center; 
+      font-size:11px;
+      padding: 10px 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: 12px;
+    }
+    .footer a{color:#9ec1ff}
 
     /* Responsive improvements */
-    @media (max-width: 600px) {
-      .wrap { padding: 12px; }
-      .frame { padding: 16px; border-radius: 20px; }
+    @media (max-width: 900px) {
+      .frame { padding: 12px; }
       .topbar { 
         flex-direction: column; 
-        gap: 12px; 
-        text-align: center; 
-        padding: 16px;
+        gap: 8px; 
+        padding: 12px; 
       }
-      .stats { justify-content: center; }
-      .main { gap: 20px; }
-      .card-frame { max-width: 300px; }
-      .sidebar { padding: 18px; position: static; }
+      .stats { 
+        justify-content: center; 
+        gap: 6px; 
+      }
+      .pill { 
+        padding: 6px 10px; 
+        font-size: 12px; 
+      }
+      .card-frame { max-width: 250px; }
+      .main { gap: 12px; }
       .guess-row { flex-direction: column; }
       .btn { width: 100%; }
-      #wrongGuesses { 
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); 
-        gap: 12px; 
-      }
-      .guess-item img { width: 48px; height: 64px; }
-      .guess-item { padding: 10px 6px; }
+      .brand .logo { width: 48px; height: 48px; }
+      .graphics-selector { grid-template-columns: 1fr; }
     }
 
-    /* Performance optimizations */
-    .stage, .sidebar, .card-frame {
-      will-change: transform;
-      backface-visibility: hidden;
+    @media (max-width: 600px) {
+      .wrap { padding: 5px; }
+      .card-frame { max-width: 220px; }
+      .sidebar { padding: 12px; }
+      .input { padding: 10px 12px; }
+      .settings-section { padding: 10px; }
+      .pill { padding: 4px 8px; font-size: 11px; }
     }
 
-    * { scroll-behavior: smooth; }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb { 
-      background: linear-gradient(180deg, #4e7dff, #2a5cff); 
-      border-radius: 4px; 
+    /* Compact layout optimizations */
+    @media (min-height: 600px) and (max-height: 800px) {
+      .frame { padding: 12px; }
+      .main { min-height: 380px; }
+      .sidebar { padding: 12px; gap: 8px; }
+      .settings-section { padding: 8px; gap: 6px; }
     }
-    ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #6e9dff, #4a7cff); }
+
+    @media (max-height: 600px) {
+      .wrap { padding: 5px; }
+      .frame { padding: 8px; }
+      .main { min-height: 320px; gap: 8px; }
+      .card-frame { max-width: 200px; }
+      .sidebar { padding: 8px; gap: 6px; }
+      .settings-section { padding: 6px; gap: 4px; }
+      .topbar { padding: 8px 12px; }
+    }
   </style>
 </head>
 <body>
 <div class="stars"></div>
+<div class="particles" id="particles"></div>
+
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <h2>Preparing Next Round...</h2>
+    <p>Get ready for the next challenge!</p>
+  </div>
+</div>
+
 <div class="wrap">
   <div class="frame">
     <div class="topbar">
@@ -746,10 +915,7 @@
           <span class="next-tag" id="nextTag" style="display:none;">Next!</span>
         </div>
         
-        <div class="wrong-guesses-section">
-          <div class="wrong-guesses-title" id="wrongGuessesTitle">Wrong Guesses</div>
-          <div id="wrongGuesses" class="wrong-guesses"></div>
-        </div>
+        <div id="wrongGuesses" class="wrong-guesses"></div>
       </section>
       
       <aside class="sidebar">
@@ -762,16 +928,43 @@
         <div class="hint">Tip: Start typing to get autocomplete suggestions.</div>
 
         <div class="status">
-          <div>Difficulty Progress</div>
+          <div>Difficulty Level</div>
           <div class="bar"><div id="difficultyBar"></div></div>
           <div id="statusText">Starting at 6 pixels.</div>
-          <button class="btn" id="skipBtn" title="Give up and reveal">Give up</button>
-          <button class="btn" id="resetBtn" title="Restart the game">Restart</button>
+          <button class="btn" id="skipBtn">Give up</button>
+          <button class="btn" id="resetBtn">Restart</button>
         </div>
-        
+
+        <div class="settings-section">
+          <div class="settings-title">Game Settings</div>
+          
+          <div class="setting-row">
+            <span class="setting-label">Graphics Quality</span>
+          </div>
+          <div class="graphics-selector">
+            <div class="graphics-option high active" id="highGraphics">
+              High Quality
+              <div>Full effects & animations</div>
+            </div>
+            <div class="graphics-option low" id="lowGraphics">
+              Performance Mode  
+              <div>Reduced effects</div>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <span class="setting-label">Background Music</span>
+            <button class="toggle-switch" id="musicToggle"></button>
+          </div>
+          
+          <div class="setting-row">
+            <span class="setting-label">Sound Effects</span>
+            <button class="toggle-switch active" id="sfxToggle"></button>
+          </div>
+        </div>
+
         <div class="footer">
-          <label id="toggleLabel" for="toggleMotionBtn">Disable Animations</label>
-          <button id="toggleMotionBtn"></button>
+          <p>Pixel Royale</p>
         </div>
       </aside>
     </div>
@@ -782,11 +975,29 @@
   <div class="msg" id="toastMsg"></div>
 </div>
 
+<!-- Audio Elements -->
+<audio id="correctSound" preload="auto">
+  <source src="Correct.mp3" type="audio/mpeg">
+</audio>
+<audio id="wrongSound" preload="auto">
+  <source src="Wrong.mp3" type="audio/mpeg">
+</audio>
+<audio id="buttonSound" preload="auto">
+  <source src="Button.mp3" type="audio/mpeg">
+</audio>
+<audio id="transitionSound" preload="auto">
+  <source src="sounds/transition.mp3" type="audio/mpeg">
+  <source src="sounds/transition.wav" type="audio/wav">
+</audio>
+<audio id="bgMusic" loop>
+  <source src="clashroyale.mp3" type="audio/mpeg">
+</audio>
+
 <script>
-// Enhanced JavaScript with improved animations and effects
+// Enhanced Pixel Royale with graphics quality settings
 
 const DECK = [
-  { name:"Knight", aliases:["Knight"], src:"https://i.ibb.co/x8RkNyrg/knight.png" },
+ { name:"Knight", aliases:["Knight"], src:"https://i.ibb.co/x8RkNyrg/knight.png" },
   { name:"Archers", aliases:["Archer","Archers"], src:"https://i.ibb.co/JWTnrQH4/archers-Cb-WDu-Tf-Y.webp" },
   { name:"Giant", aliases:["Giant"], src:"https://i.ibb.co/ZRF3Nv33/giant-D9w-Wcvn6.webp" },
   { name:"Musketeer", aliases:["Musketeer"], src:"https://i.ibb.co/ymzGFZFy/musketeer-DQp-JQ7-Wk.webp" },
@@ -896,25 +1107,133 @@ const DECK = [
   { name:"Vines", aliases:["Vines"], src:"https://i.ibb.co/1GvDNRkC/vines.webp" },
   { name:"Goblin Curse", aliases:["Goblin Curse","Curse"], src:"https://i.ibb.co/Z63jFrM2/goblin-curse.webp" },
   { name:"Electro Wizard", aliases:["Electro Wizard, Wizard"], src:"https://i.ibb.co/GfHjbMJL/electro-wizard.webp" },
-  { name:"Skeleton Dragon", aliases:["Skeleton, Dragon"], src:"https://i.ibb.co/nqZyK5Wk/skeleton-dragons.webp" }
-
+  { name:"Skeleton Dragon", aliases:["Skeleton, Dragon"], src:"https://i.ibb.co/nqZyK5Wk/skeleton-dragons.webp" } 
 ];
 
 const START_PIXELS = 6;
 const PIXEL_STEP = 6;
 const MAX_PIXELS = 400;
 
-// Game state
-let score = 0;
-let round = 1;
-let difficultyPixels = START_PIXELS;
+let score = 0, round = 1, difficultyPixels = START_PIXELS;
 let order = shuffle([...DECK.keys()]);
 let cursor = 0;
+let musicEnabled = false, sfxEnabled = true;
 let wrongGuesses = [];
-let currentImage = new Image();
-let autocompleteTimeout;
+let graphicsQuality = 'high'; // 'high' or 'low'
 
-// DOM elements
+// Audio elements
+const sounds = {
+  correct: document.getElementById('correctSound'),
+  wrong: document.getElementById('wrongSound'),
+  button: document.getElementById('buttonSound'),
+  transition: document.getElementById('transitionSound'),
+  bgMusic: document.getElementById('bgMusic')
+};
+
+// Set initial volume levels
+Object.values(sounds).forEach(audio => {
+  if (audio) {
+    audio.volume = audio.id === 'bgMusic' ? 0.3 : 0.5;
+  }
+});
+
+// Enhanced particle system for high graphics mode
+function createParticles() {
+  if (graphicsQuality === 'low') return;
+  
+  const particlesContainer = document.getElementById('particles');
+  
+  setInterval(() => {
+    if (document.documentElement.getAttribute('data-graphics') === 'low') return;
+    
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    
+    // Random starting position
+    particle.style.left = Math.random() * 100 + 'vw';
+    particle.style.animationDuration = (Math.random() * 6 + 4) + 's';
+    particle.style.animationDelay = Math.random() * 2 + 's';
+    
+    // Random colors
+    const colors = ['#ff0080', '#00ffff', '#ffcc33', '#8a2be2'];
+    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+    
+    particlesContainer.appendChild(particle);
+    
+    // Remove particle after animation
+    setTimeout(() => {
+      if (particlesContainer.contains(particle)) {
+        particlesContainer.removeChild(particle);
+      }
+    }, 10000);
+  }, 800);
+}
+
+// Graphics quality management
+function setGraphicsQuality(quality) {
+  graphicsQuality = quality;
+  const root = document.documentElement;
+  
+  if (quality === 'low') {
+    root.setAttribute('data-graphics', 'low');
+    // Clear existing particles
+    document.getElementById('particles').innerHTML = '';
+  } else {
+    root.removeAttribute('data-graphics');
+    createParticles(); // Restart particle system
+  }
+  
+  // Update UI
+  document.getElementById('highGraphics').classList.toggle('active', quality === 'high');
+  document.getElementById('lowGraphics').classList.toggle('active', quality === 'low');
+  
+  // Save preference
+  localStorage.setItem('pixelRoyale_graphics', quality);
+}
+
+// Load saved graphics preference
+function loadGraphicsPreference() {
+  const saved = localStorage.getItem('pixelRoyale_graphics');
+  if (saved && (saved === 'high' || saved === 'low')) {
+    setGraphicsQuality(saved);
+  }
+}
+
+// Simple audio playback function
+function playSound(type) {
+  if (!sfxEnabled && type !== 'bgMusic') return;
+  if (!musicEnabled && type === 'bgMusic') return;
+  
+  const audio = sounds[type];
+  if (audio) {
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+  }
+}
+
+function stopSound(type) {
+  const audio = sounds[type];
+  if (audio) {
+    audio.pause();
+    audio.currentTime = 0;
+  }
+}
+
+// Enhanced loading screen
+function showLoadingScreen() {
+  const loadingScreen = document.getElementById('loadingScreen');
+  loadingScreen.classList.add('active');
+  playSound('transition');
+  
+  return new Promise(resolve => {
+    setTimeout(() => {
+      loadingScreen.classList.remove('active');
+      resolve();
+    }, 2000);
+  });
+}
+
+// DOM Elements
 const canvas = document.getElementById('pixelCanvas');
 const ctx = canvas.getContext('2d');
 const pixelInfo = document.getElementById('pixelInfo');
@@ -933,415 +1252,326 @@ const confettiBox = document.getElementById('confetti');
 const cardFrame = document.getElementById('cardFrame');
 const autocompleteDiv = document.getElementById('autocomplete');
 const wrongGuessesDiv = document.getElementById('wrongGuesses');
-const wrongGuessesTitle = document.getElementById('wrongGuessesTitle');
-const toggleBtn = document.getElementById('toggleMotionBtn');
+const loadingScreen = document.getElementById('loadingScreen');
+
+// Settings controls
+const musicToggle = document.getElementById('musicToggle');
+const sfxToggle = document.getElementById('sfxToggle');
+const highGraphics = document.getElementById('highGraphics');
+const lowGraphics = document.getElementById('lowGraphics');
+
+let currentImage = new Image();
+currentImage.crossOrigin = 'anonymous';
 
 // Initialize game
-currentImage.crossOrigin = 'anonymous';
+loadGraphicsPreference();
 loadCurrentCard();
 updateUI();
 
-// Animation toggle functionality
-toggleBtn.addEventListener('click', () => {
-  const isActive = toggleBtn.classList.contains('active');
-  if (isActive) {
-    document.documentElement.removeAttribute('data-reduced-motion');
-    toggleBtn.classList.remove('active');
+// Graphics quality event listeners
+highGraphics.addEventListener('click', () => {
+  playSound('button');
+  setGraphicsQuality('high');
+  notify('High graphics enabled! Full visual effects active.', 2000);
+});
+
+lowGraphics.addEventListener('click', () => {
+  playSound('button');
+  setGraphicsQuality('low');
+  notify('Performance mode enabled! Optimized for smooth gameplay.', 2000);
+});
+
+// Toggle event listeners
+musicToggle.addEventListener('click', () => {
+  playSound('button');
+  musicEnabled = !musicEnabled;
+  musicToggle.classList.toggle('active', musicEnabled);
+  
+  if (musicEnabled) {
+    playSound('bgMusic');
   } else {
-    document.documentElement.setAttribute('data-reduced-motion', 'true');
-    toggleBtn.classList.add('active');
+    stopSound('bgMusic');
   }
 });
 
-// Utility functions
-function shuffle(arr) {
-  const newArr = [...arr];
-  for (let i = newArr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+sfxToggle.addEventListener('click', () => {
+  if (sfxEnabled) playSound('button'); // Play before disabling
+  sfxEnabled = !sfxEnabled;
+  sfxToggle.classList.toggle('active', sfxEnabled);
+});
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
   }
-  return newArr;
+  return arr;
 }
 
-function currentCard() {
-  return DECK[order[cursor % order.length]];
+function currentCard(){ 
+  return DECK[order[cursor % order.length]]; 
 }
 
-function nextCard() {
+async function nextCard(){
   cursor++;
   round++;
-  nextTag.style.display = 'none';
+  nextTag.style.display='none';
+  cardFrame.classList.remove('revealed');
   
-  if (cursor % order.length === 0) {
-    order = shuffle(order);
+  if(cursor % order.length === 0){ 
+    order = shuffle(order); 
   }
+  
+  // Show loading screen
+  await showLoadingScreen();
   
   loadCurrentCard();
   updateUI();
 }
 
-function loadCurrentCard() {
+function loadCurrentCard(){
   const card = currentCard();
   currentImage = new Image();
   currentImage.crossOrigin = 'anonymous';
-  currentImage.onload = () => {
-    requestAnimationFrame(() => {
-      drawPixelated(currentImage, difficultyPixels);
-    });
-  };
-  currentImage.onerror = () => {
-    console.error('Failed to load image:', card.src);
-  };
+  currentImage.onload = ()=> drawPixelated(currentImage, difficultyPixels);
   currentImage.src = card.src;
 }
 
-function drawPixelated(img, pixels) {
-  const aspect = 3 / 4;
+function drawPixelated(img, pixels){
+  const aspect = 3/4;
   const targetBlocks = Math.max(6, Math.min(pixels, MAX_PIXELS));
-  let cols = Math.max(3, Math.round(Math.sqrt(targetBlocks * aspect)));
+  let cols = Math.max(3, Math.round(Math.sqrt(targetBlocks*aspect)));
   let rows = Math.max(2, Math.round(cols / aspect));
+  const w = cols, h = rows;
   
-  const offCanvas = document.createElement('canvas');
-  offCanvas.width = cols;
-  offCanvas.height = rows;
-  const offCtx = offCanvas.getContext('2d');
-  
-  const { sx, sy, sw, sh } = cover(img.width, img.height, cols, rows);
-  
-  offCtx.drawImage(img, sx, sy, sw, sh, 0, 0, cols, rows);
+  const off = document.createElement('canvas'); 
+  off.width = w; off.height = h;
+  const octx = off.getContext('2d');
+  const {sx, sy, sw, sh} = cover(img.width, img.height, w, h);
+  octx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
   
   ctx.imageSmoothingEnabled = false;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(offCanvas, 0, 0, cols, rows, 0, 0, canvas.width, canvas.height);
-  
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(off, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
   pixelInfo.textContent = targetBlocks;
 }
 
-function cover(srcW, srcH, destW, destH) {
-  const srcRatio = srcW / srcH;
-  const destRatio = destW / destH;
+function cover(srcW, srcH, destW, destH){
+  const srcRatio = srcW/srcH, destRatio = destW/destH;
   let newW, newH;
-  
-  if (destRatio > srcRatio) {
-    newW = srcW;
-    newH = srcW / destRatio;
+  if(destRatio > srcRatio){
+    newW=srcW; newH=srcW/destRatio;
   } else {
-    newH = srcH;
-    newW = srcH * destRatio;
+    newH=srcH; newW=srcH*destRatio;
   }
-  
-  const sx = (srcW - newW) / 2;
-  const sy = (srcH - newH) / 2;
-  
-  return { sx, sy, sw: newW, sh: newH };
+  const sx=(srcW-newW)/2; 
+  const sy=(srcH-newH)/2;
+  return {sx, sy, sw:newW, sh:newH};
 }
 
 // Form handling
-guessForm.addEventListener('submit', (e) => {
+guessForm.addEventListener('submit', e => {
   e.preventDefault();
   const guess = guessInput.value.trim();
-  
   if (!guess) return;
 
   const allAliases = DECK.flatMap(c => c.aliases.map(a => a.toLowerCase()));
   if (!allAliases.includes(guess.toLowerCase())) {
-    notify("Invalid card name! Try typing for suggestions.", 2000);
-    guessInput.classList.add('shake');
-    setTimeout(() => guessInput.classList.remove('shake'), 500);
+    notify("Invalid card name!", 1500);
+    wrongAnimation();
+    playSound('wrong');
+    guessInput.value = '';
     return;
   }
 
   const card = currentCard();
-  const isCorrect = card.aliases.some(a => a.toLowerCase() === guess.toLowerCase());
-  
-  if (isCorrect) {
-    handleCorrectGuess();
+  if (card.aliases.some(a => a.toLowerCase() === guess.toLowerCase())) {
+    handleRight();
   } else {
-    handleWrongGuess(guess);
+    handleWrong(guess);
   }
 
   guessInput.value = '';
-  clearAutocomplete();
+  autocompleteDiv.innerHTML = '';
 });
 
-// Button event listeners
 skipBtn.addEventListener('click', () => {
-  notify(`The card was: ${currentCard().name}`, 3000);
   revealCard();
   resetDifficulty();
-  setTimeout(() => nextCard(), 2000);
+  wrongGuesses = [];
+  wrongGuessesDiv.innerHTML = '';
+  
+  nextTag.style.display = 'block';
+  setTimeout(() => { nextCard(); }, 2500);
 });
 
 resetBtn.addEventListener('click', () => {
-  if (confirm('Are you sure you want to restart the game?')) {
-    location.reload();
-  }
+  playSound('button');
+  location.reload();
 });
 
-// Game logic
-function handleCorrectGuess() {
-  playCorrectAnimation();
+function revealCard() {
+  notify(`💡 The card was: ${currentCard().name}`, 3000);
+  playSound('transition');
+  
+  // Show full card with enhanced effects in high graphics mode
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+  cardFrame.classList.add('revealed');
+  
+  if (graphicsQuality === 'high') {
+    cardFrame.classList.add('success-glow');
+    setTimeout(() => cardFrame.classList.remove('success-glow'), 1500);
+  }
+}
+
+async function handleRight(){
+  playSound('correct');
+  rightAnimation();
   score++;
-  notify('Correct! Well done!', 2000);
+  notify('Correct! Amazing guess!', 2000);
   
   revealCard();
   resetDifficulty();
-  clearWrongGuesses();
+  wrongGuesses = [];
+  wrongGuessesDiv.innerHTML = '';
 
   nextTag.style.display = 'block';
-  setTimeout(() => nextCard(), 2000);
+  setTimeout(() => { nextCard(); }, 2500);
 }
 
-function handleWrongGuess(guess) {
-  playWrongAnimation();
-  notify('Wrong! The card becomes clearer.', 1500);
+function handleWrong(guess){
+  playSound('wrong');
+  wrongAnimation();
+  notify('Wrong! The image becomes clearer.', 1500);
   increaseDifficulty();
   drawPixelated(currentImage, difficultyPixels);
 
-  const card = DECK.find(c => 
-    c.aliases.some(a => a.toLowerCase() === guess.toLowerCase())
-  );
-  
-  if (card && !wrongGuesses.includes(card.name)) {
-    addWrongGuess(card);
+  const card = DECK.find(c => c.aliases.some(a => a.toLowerCase() === guess.toLowerCase()));
+  if (card && !wrongGuesses.includes(card.name)){
+    wrongGuesses.push(card.name);
+    const item = document.createElement('div');
+    item.innerHTML = `<img src="${card.src}" alt="${card.name}" loading="lazy"><span>${card.name}</span>`;
+    wrongGuessesDiv.appendChild(item);
   }
 }
 
-function addWrongGuess(card) {
-  wrongGuesses.push(card.name);
-  
-  // Show title if first wrong guess
-  if (wrongGuesses.length === 1) {
-    wrongGuessesTitle.classList.add('show');
-  }
-  
-  const item = document.createElement('div');
-  item.className = 'guess-item';
-  item.style.animationDelay = `${wrongGuesses.length * 0.15}s`;
-  
-  item.innerHTML = `
-    <img src="${card.src}" alt="${card.name}" loading="lazy">
-    <span>${card.name}</span>
-  `;
-  
-  wrongGuessesDiv.appendChild(item);
+function resetDifficulty(){ 
+  difficultyPixels = START_PIXELS; 
+  updateUI(); 
 }
 
-function clearWrongGuesses() {
-  wrongGuesses = [];
-  wrongGuessesDiv.innerHTML = '';
-  wrongGuessesTitle.classList.remove('show');
+function increaseDifficulty(){ 
+  difficultyPixels = Math.min(MAX_PIXELS, difficultyPixels + PIXEL_STEP); 
+  updateUI(); 
 }
 
-function revealCard() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.imageSmoothingEnabled = true;
-  ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
-}
-
-function resetDifficulty() {
-  difficultyPixels = START_PIXELS;
-  updateUI();
-}
-
-function increaseDifficulty() {
-  difficultyPixels = Math.min(MAX_PIXELS, difficultyPixels + PIXEL_STEP);
-  updateUI();
-}
-
-function updateUI() {
+function updateUI(){
   scoreEl.textContent = score;
   roundEl.textContent = round;
   pixelInfo.textContent = difficultyPixels;
-  
-  const percentage = Math.min(100, (difficultyPixels / MAX_PIXELS) * 100);
-  diffBar.style.width = `${percentage}%`;
-  
-  statusText.textContent = `Visibility: ${difficultyPixels} pixels`;
+  diffBar.style.width = `${Math.min(100, difficultyPixels/MAX_PIXELS*100)}%`;
+  statusText.textContent = `Clarity: ${difficultyPixels} pixels`;
 }
 
-// Enhanced notification system
-function notify(msg, duration = 2000) {
-  toastMsg.textContent = msg;
-  toast.style.display = 'grid';
-  toast.classList.add('show');
-  
-  clearTimeout(window.notifyTimeout);
-  window.notifyTimeout = setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => {
-      toast.style.display = 'none';
-    }, 400);
-  }, duration);
+function notify(msg, ms=2000){ 
+  toastMsg.textContent = msg; 
+  toast.style.display = 'grid'; 
+  setTimeout(() => toast.style.display = 'none', ms); 
 }
 
-// Enhanced animation functions
-function playWrongAnimation() {
-  cardFrame.classList.remove('shake');
-  requestAnimationFrame(() => {
-    cardFrame.classList.add('shake');
-    setTimeout(() => cardFrame.classList.remove('shake'), 600);
-  });
+function wrongAnimation(){ 
+  cardFrame.classList.remove('shake'); 
+  void cardFrame.offsetWidth; 
+  cardFrame.classList.add('shake'); 
 }
 
-function playCorrectAnimation() {
-  createAdvancedConfetti();
-  
-  // Card celebration animation
-  cardFrame.style.transform = 'scale(1.05) rotateY(5deg)';
-  cardFrame.style.boxShadow = '0 30px 60px rgba(0,0,0,0.4), 0 0 100px rgba(78, 125, 255, 0.4)';
-  
-  setTimeout(() => {
-    cardFrame.style.transform = '';
-    cardFrame.style.boxShadow = '';
-  }, 800);
-}
-
-// Advanced confetti system with multiple particle types
-function createAdvancedConfetti() {
+function rightAnimation(){
+  // Enhanced confetti based on graphics quality
   confettiBox.innerHTML = '';
+  const colors = ['#ffcc33', '#ff6b9d', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7'];
+  const particleCount = graphicsQuality === 'high' ? 50 : 20;
   
-  const particleCount = 60;
-  const colors = [
-    '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57',
-    '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43'
-  ];
-  
-  for (let i = 0; i < particleCount; i++) {
-    createConfettiParticle(colors, i);
+  for(let i = 0; i < particleCount; i++){
+    const piece = document.createElement('div');
+    piece.style.position = 'absolute';
+    piece.style.left = `${50 + Math.random() * 60 - 30}%`;
+    piece.style.top = '50%';
+    piece.style.width = piece.style.height = `${Math.random() * 8 + 4}px`;
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.opacity = 0.9;
+    piece.style.zIndex = '10';
+    confettiBox.appendChild(piece);
+    
+    if (graphicsQuality === 'high') {
+      animateConfettiAdvanced(piece);
+    } else {
+      animateConfettiSimple(piece);
+    }
   }
   
-  // Create special star particles
-  for (let i = 0; i < 15; i++) {
-    createStarParticle(i + particleCount);
-  }
-  
-  setTimeout(() => confettiBox.innerHTML = '', 1500);
+  setTimeout(() => confettiBox.innerHTML = '', graphicsQuality === 'high' ? 1200 : 800);
 }
 
-function createConfettiParticle(colors, index) {
-  const particle = document.createElement('div');
-  const isRound = Math.random() > 0.5;
-  const size = 4 + Math.random() * 8;
-  const color = colors[Math.floor(Math.random() * colors.length)];
-  
-  particle.className = 'confetti-particle';
-  particle.style.cssText = `
-    left: ${40 + Math.random() * 20}%;
-    top: ${40 + Math.random() * 20}%;
-    width: ${size}px;
-    height: ${size}px;
-    background: ${color};
-    border-radius: ${isRound ? '50%' : '2px'};
-    box-shadow: 0 0 6px ${color}aa;
-  `;
-  
-  confettiBox.appendChild(particle);
-  
-  const angle = (Math.random() - 0.5) * Math.PI;
-  const velocity = 150 + Math.random() * 300;
-  const x = Math.cos(angle) * velocity;
-  const y = Math.sin(angle) * velocity - 100;
+function animateConfettiAdvanced(el){
+  const x = (Math.random() - 0.5) * 600; 
+  const y = -300 - Math.random() * 200;
   const rotation = Math.random() * 1080;
-  const duration = 1000 + Math.random() * 500;
+  const duration = 800 + Math.random() * 600;
   
-  particle.animate([
+  el.animate([
     {
-      transform: 'translate(0, 0) rotate(0deg) scale(1)',
-      opacity: 1
+      transform: `translate(0,0) rotate(0deg)`,
+      opacity: 0.9
     },
     {
-      transform: `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(0.3)`,
+      transform: `translate(${x}px,${y}px) rotate(${rotation}deg)`,
       opacity: 0
     }
   ], {
-    duration,
-    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-    delay: index * 20
+    duration: duration, 
+    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
   });
 }
 
-function createStarParticle(index) {
-  const star = document.createElement('div');
-  star.className = 'confetti-particle';
+function animateConfettiSimple(el){
+  const x = (Math.random() - 0.5) * 300; 
+  const y = -200 - Math.random() * 100;
+  const duration = 600 + Math.random() * 200;
   
-  const size = 8 + Math.random() * 6;
-  star.style.cssText = `
-    left: ${45 + Math.random() * 10}%;
-    top: ${45 + Math.random() * 10}%;
-    width: ${size}px;
-    height: ${size}px;
-    background: #ffd700;
-    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-    box-shadow: 0 0 12px #ffd700aa;
-  `;
-  
-  confettiBox.appendChild(star);
-  
-  const angle = Math.random() * Math.PI * 2;
-  const distance = 200 + Math.random() * 200;
-  const x = Math.cos(angle) * distance;
-  const y = Math.sin(angle) * distance;
-  const rotation = Math.random() * 720;
-  
-  star.animate([
-    {
-      transform: 'translate(0, 0) rotate(0deg) scale(1)',
-      opacity: 1,
-      filter: 'brightness(1)'
-    },
-    {
-      transform: `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(0.2)`,
-      opacity: 0,
-      filter: 'brightness(2)'
-    }
+  el.animate([
+    { transform: 'translate(0,0)', opacity: 1 },
+    { transform: `translate(${x}px,${y}px)`, opacity: 0 }
   ], {
-    duration: 1200,
-    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-    delay: index * 30
+    duration: duration,
+    easing: 'ease-out'
   });
 }
 
-// Autocomplete functionality
-function clearAutocomplete() {
-  clearTimeout(autocompleteTimeout);
+// Enhanced autocomplete
+guessInput.addEventListener('input', () => {
+  const query = guessInput.value.trim().toLowerCase();
   autocompleteDiv.innerHTML = '';
-}
 
-guessInput.addEventListener('input', (e) => {
-  clearTimeout(autocompleteTimeout);
-  
-  const query = e.target.value.trim().toLowerCase();
-  
-  if (!query) {
-    clearAutocomplete();
-    return;
-  }
+  if (!query) return;
 
-  autocompleteTimeout = setTimeout(() => {
-    showAutocomplete(query);
-  }, 150);
-});
-
-function showAutocomplete(query) {
   const matches = DECK.filter(card => {
-    const nameMatch = card.name.toLowerCase().includes(query);
-    const aliasMatch = card.aliases?.some(alias => 
-      alias.toLowerCase().includes(query)
-    );
+    const nameMatch = card.name.toLowerCase().startsWith(query);
+    const aliasMatch = card.aliases?.some(alias => alias.toLowerCase().startsWith(query));
     return nameMatch || aliasMatch;
-  }).slice(0, 8);
-
-  autocompleteDiv.innerHTML = '';
+  }).slice(0, 5);
 
   matches.forEach((card, index) => {
     const item = document.createElement('div');
     item.className = 'autocomplete-item';
-    item.style.animationDelay = `${index * 0.05}s`;
+    
+    if (graphicsQuality === 'high') {
+      item.style.animationDelay = `${index * 0.05}s`;
+    }
 
     const img = document.createElement('img');
     img.src = card.src;
-    img.alt = card.name;
     img.loading = 'lazy';
 
     const span = document.createElement('span');
@@ -1351,95 +1581,79 @@ function showAutocomplete(query) {
     item.appendChild(span);
 
     item.addEventListener('click', () => {
+      playSound('button');
       guessInput.value = card.name;
-      clearAutocomplete();
+      autocompleteDiv.innerHTML = '';
       guessInput.focus();
     });
 
     autocompleteDiv.appendChild(item);
   });
-}
+});
 
 // Hide autocomplete when clicking outside
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('#autocomplete') && e.target !== guessInput) {
-    clearAutocomplete();
+  if (!autocompleteDiv.contains(e.target) && e.target !== guessInput) {
+    autocompleteDiv.innerHTML = '';
   }
 });
 
-// Keyboard navigation for autocomplete
+// Enhanced keyboard navigation
 guessInput.addEventListener('keydown', (e) => {
   const items = autocompleteDiv.querySelectorAll('.autocomplete-item');
-  let selectedIndex = Array.from(items).findIndex(item => 
-    item.classList.contains('selected')
-  );
-
-  switch (e.key) {
+  if (items.length === 0) return;
+  
+  let currentIndex = Array.from(items).findIndex(item => item.classList.contains('selected'));
+  
+  switch(e.key) {
     case 'ArrowDown':
       e.preventDefault();
-      selectedIndex = (selectedIndex + 1) % items.length;
-      updateSelection(items, selectedIndex);
+      if (currentIndex < items.length - 1) currentIndex++;
+      else currentIndex = 0;
       break;
     case 'ArrowUp':
       e.preventDefault();
-      selectedIndex = selectedIndex <= 0 ? items.length - 1 : selectedIndex - 1;
-      updateSelection(items, selectedIndex);
+      if (currentIndex > 0) currentIndex--;
+      else currentIndex = items.length - 1;
       break;
+    case 'Tab':
     case 'Enter':
-      if (selectedIndex >= 0) {
-        e.preventDefault();
-        items[selectedIndex].click();
+      if (e.key === 'Tab') e.preventDefault();
+      if (currentIndex >= 0 && e.key !== 'Enter') {
+        items[currentIndex].click();
+        return;
       }
       break;
     case 'Escape':
-      clearAutocomplete();
-      break;
-  }
-});
-
-function updateSelection(items, selectedIndex) {
-  items.forEach((item, index) => {
-    item.classList.toggle('selected', index === selectedIndex);
-  });
-}
-
-// Performance optimizations - preload images
-function preloadNextImages() {
-  const nextCards = [];
-  for (let i = 1; i <= 3; i++) {
-    const nextIndex = (cursor + i) % order.length;
-    nextCards.push(DECK[order[nextIndex]]);
+      autocompleteDiv.innerHTML = '';
+      return;
+    default:
+      return;
   }
   
-  nextCards.forEach(card => {
-    const img = new Image();
-    img.src = card.src;
-  });
-}
-
-setTimeout(preloadNextImages, 1000);
-
-// Error handling
-window.addEventListener('error', (e) => {
-  console.error('Game error:', e.error);
-  notify('An error occurred. Please refresh the page.', 3000);
-});
-
-// Responsive canvas handling
-function handleResize() {
-  if (currentImage.complete && currentImage.naturalWidth > 0) {
-    drawPixelated(currentImage, difficultyPixels);
+  // Update selection
+  items.forEach(item => item.classList.remove('selected'));
+  if (currentIndex >= 0) {
+    items[currentIndex].classList.add('selected');
+    items[currentIndex].scrollIntoView({ block: 'nearest' });
   }
-}
-
-let resizeTimeout;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(handleResize, 250);
 });
 
-// Add some extra visual polish with CSS custom properties
-document.documentElement.style.setProperty('--game-hue', Math.floor(Math.random() * 360));
+// Add click sounds to buttons
+document.querySelectorAll('.btn').forEach(button => {
+  button.addEventListener('click', () => playSound('button'));
+});
+
+// Enable audio context on first interaction
+document.addEventListener('click', () => {
+  Object.values(sounds).forEach(audio => {
+    if (audio && audio.play) {
+      audio.play().then(() => audio.pause()).catch(() => {});
+    }
+  });
+}, { once: true });
+
+console.log('Pixel Royale loaded successfully!');
 </script>
 </body>
 </html>
